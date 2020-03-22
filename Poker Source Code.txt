@@ -1,0 +1,5420 @@
+Dim PlayerBal As Double 'money               'bugs - if bot4 folds, cards wont open (removed folding option for bot 4)
+Dim Bot1Bal As Double                        'also so player can keep playing with someone
+Dim Bot2Bal As Double                        'flop/river/turn won't open sometimes 1st game is over
+Dim Bot3Bal As Double
+Dim Bot4Bal As Double                        'if there is an equal hand, it cannot determine
+Dim Pot As Double                            'which one is higher ex. two players with two pairs
+Dim CallBal As Double
+Dim rndRaise As Integer                      'PlayerCard = 10, RoyalF
+Dim tempRaise As Integer                     'PlayerCard = 9, StraightF
+Dim tempSBal As Integer                      'PlayerCard = 8, FourKind -- DONE
+Dim tempBBal As Integer                      'PlayerCard = 7, FullH -- DONE
+                                             'PlayerCard = 6, Flush
+Dim BigBlind As Integer 'blinds              'PlayerCard = 5, Straight
+Dim SmallBlind As Integer                    'PlayerCard = 4, ThreeKind -- DONE
+Dim PlayerBigBlind As Boolean                'PlayerCard = 3, TwoPair -- DONE
+Dim PlayerSmallBlind As Boolean              'PlayerCard = 2, OnePair -- DONE
+Dim Bot1BigBlind As Boolean                  'PlayerCard = 1, HighCard -- DONE
+Dim Bot1SmallBlind As Boolean
+Dim Bot2BigBlind As Boolean
+Dim Bot2SmallBlind As Boolean
+Dim Bot3BigBlind As Boolean
+Dim Bot3SmallBlind As Boolean
+Dim Bot4BigBlind As Boolean
+Dim Bot4SmallBlind As Boolean
+Dim BBlindCounter As Integer
+Dim SBlindCounter As Integer
+
+Dim Dealer As Integer 'dealer
+Dim PlayerDealer As Boolean
+Dim Bot1Dealer As Boolean
+Dim Bot2Dealer As Boolean
+Dim Bot3Dealer As Boolean
+Dim Bot4Dealer As Boolean
+
+Dim Turn As Integer 'turn
+Dim PlayerTurn As Boolean
+Dim TurnTaken As Boolean
+Dim Bot1Turn As Boolean
+Dim Bot2Turn As Boolean
+Dim Bot3Turn As Boolean
+Dim Bot4Turn As Boolean
+Dim PlayerFold As Boolean
+Dim Bot1Fold As Boolean
+Dim Bot2Fold As Boolean
+Dim Bot3Fold As Boolean
+Dim Bot4Fold As Boolean
+Dim FoldCounter As Integer
+Dim rndTurn As Integer
+Dim FirstRoundBet As Boolean
+Dim SecondRoundBet As Boolean
+Dim roundCounter As Integer
+Dim PlayerAllIn As Boolean
+Dim Bot1AllIn As Boolean
+Dim Bot2AllIn As Boolean
+Dim Bot3AllIn As Boolean
+Dim Bot4AllIn As Boolean
+
+Dim GameTimeS As Integer 'time
+Dim GameTimeM As Integer
+Dim tempGameTimeS As String
+Dim tempGameTimeM As String
+Dim PlayerTime As Integer
+
+Dim Hearts(1 To 13) As String 'cards
+Dim Diamonds(1 To 13) As String
+Dim Spades(1 To 13) As String
+Dim Clubs(1 To 13) As String
+Dim rndCard As Integer
+Dim rndCounter As Integer
+Dim rndCards As Integer
+
+Dim PlayerWin As Boolean 'wins
+Dim Bot1Win As Boolean
+Dim Bot2Win As Boolean
+Dim Bot3Win As Boolean
+Dim Bot4Win As Boolean
+
+Dim PlayerCards As Integer 'check Poker hands (card ranking)
+Dim Bot1Cards As Integer
+Dim Bot2Cards As Integer
+Dim Bot3Cards As Integer
+Dim Bot4Cards As Integer
+
+Dim PlayerCardNum1 As Integer 'card int
+Dim PlayerCardNum2 As Integer
+Dim Bot1CardNum1 As Integer
+Dim Bot1CardNum2 As Integer
+Dim Bot2CardNum1 As Integer
+Dim Bot2CardNum2 As Integer
+Dim Bot3CardNum1 As Integer
+Dim Bot3CardNum2 As Integer
+Dim Bot4CardNum1 As Integer
+Dim Bot4CardNum2 As Integer
+Dim FlopCardNum1 As Integer
+Dim FlopCardNum2 As Integer
+Dim FlopCardNum3 As Integer
+Dim TurnCardNum As Integer
+Dim RiverCardNum As Integer
+Dim wordNum As String
+Dim wordNum1 As String
+Dim wordNum2 As String
+Dim wordNum3 As String
+Dim wordNum4 As String
+Dim timesCounter As Integer
+Dim N As Variant
+Dim N1 As Variant
+Dim N2 As Variant
+Dim N3 As Variant
+Dim N4 As Variant
+Dim PairCounter As Integer
+Dim PairCounter1 As Integer
+Dim PairCounter2 As Integer
+Dim PairCounter3 As Integer
+Dim PairCounter4 As Integer
+Dim ThreeCounter As Integer
+Dim ThreeCounter1 As Integer
+Dim ThreeCounter2 As Integer
+Dim ThreeCounter3 As Integer
+Dim ThreeCounter4 As Integer
+
+
+Private Sub cmdCall_Click()
+
+cmdCall.Visible = False
+cmdRaise.Visible = False
+cmdFold.Visible = False
+
+If PlayerBal > CallBal Then
+
+    Pot = Pot + CallBal
+    PlayerBal = PlayerBal - CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblPlayerBal = "Balance: $" & PlayerBal
+    lblPM.Visible = True
+    lblPM.Caption = "You have called."
+    PlayerTurn = False
+    PlayerTime = 2
+    TurnTaken = True
+
+ElseIf PlayerBal <= CallBal Then 'not enough for call, all in
+
+    CallBal = PlayerBal
+    Pot = Pot + CallBal
+    PlayerBal = PlayerBal - CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblPlayerBal = "Balance: $" & PlayerBal
+    lblPM.Visible = True
+    lblPM.Caption = "You went all in."
+    PlayerTurn = False
+    PlayerTime = 2
+    TurnTaken = True
+    PlayerAllIn = True
+
+ElseIf PlayerSmallBlind = True And CallBal <> SmallBlind * 2 Then
+            
+    tempSBal = CallBal - SmallBlind
+    PlayerBal = PlayerBal - tempSBal
+    Pot = Pot + CallBal
+    lblPlayerBal.Caption = "Balance: $" & PlayerBal
+    lblPM.Caption = "You have called."
+    lblPot.Caption = "Pot: $" & Pot
+    lblPM.Visible = True
+    PlayerTurn = False
+
+End If
+
+End Sub
+
+Private Sub cmdCheck_Click()
+
+CallBal = BigBlind
+Pot = Pot + CallBal
+PlayerBal = PlayerBal - CallBal
+lblPot.Caption = "Pot: $" & Pot
+lblPlayerBal = "Balance: $" & PlayerBal
+lblPM.Caption = "You have checked."
+PlayerTurn = False
+TurnTaken = True
+
+End Sub
+
+Private Sub cmdFold_Click()
+
+FoldCounter = FoldCounter + 1
+TurnTaken = True
+cmdFold.Visible = False
+cmdCall.Visible = False
+cmdRaise.Visible = False
+imgPB1.Visible = True
+imgPB2.Visible = True
+lblPM.Visible = True
+lblPM.Caption = "You have folded."
+PlayerTurn = False
+PlayerFold = True
+PlayerTime = 1
+lblPlayerTime.Caption = PlayerTime
+
+End Sub
+
+Private Sub cmdRaise_Click()
+
+lblBack.Visible = True
+HScrollBal.Visible = True
+lblSliderBal.Visible = True
+lblConfirmRaise.Visible = True
+HScrollBal.Min = CallBal + 1
+HScrollBal.Max = PlayerBal
+cmdRaise.Visible = False
+cmdCall.Visible = False
+cmdCheck.Visible = False
+cmdFold.Visible = False
+
+End Sub
+
+Private Sub cmdStart_Click()
+
+tmrPlayerTime.Enabled = True
+tmrTime.Enabled = True
+cmdStart.Visible = False
+lblTurn.Visible = True
+lblPot.Visible = True
+tmrSBlindDelay.Enabled = True
+Call DealerP
+Call RandomCardsP
+imgB1B1.Visible = True
+imgB1B2.Visible = True
+imgB2B1.Visible = True
+imgB2B2.Visible = True
+imgB3B1.Visible = True
+imgB3B2.Visible = True
+imgB4B1.Visible = True
+imgB4B2.Visible = True
+imgFirstCard.Visible = True
+imgSecondCard.Visible = True
+imgThirdCard.Visible = True
+imgTurn.Visible = True
+imgRiver.Visible = True
+imgSmallBlind.Visible = True
+imgBigBlind.Visible = True
+
+End Sub
+
+Private Sub Form_Load()
+
+SBlindCounter = 1
+BBlindCounter = 1
+PlayerBal = 10000
+Bot1Bal = 10000
+Bot2Bal = 10000
+Bot3Bal = 10000
+Bot4Bal = 10000
+SmallBlind = 5
+BigBlind = 10
+CallBal = BigBlind
+PlayerTime = 20
+Bot1Turn = True
+Turn = 4
+Bot3SmallBlind = True
+Bot4BigBlind = True
+
+For x = 1 To 13
+
+    Hearts(x) = imgHearts(x).Tag
+    Diamonds(x) = imgDiamonds(x).Tag
+    Clubs(x) = imgClubs(x).Tag
+    Spades(x) = imgSpades(x).Tag
+    
+Next x
+
+End Sub
+
+Private Sub HScrollBal_Change()
+
+lblSliderBal.Caption = "$" & HScrollBal.Value
+
+End Sub
+
+Private Sub HScrollBal_Scroll()
+
+lblSliderBal.Caption = "$" & HScrollBal.Value
+
+End Sub
+
+Private Sub lblBack_Click()
+
+lblBack.Visible = False
+HScrollBal.Visible = False
+lblSliderBal.Visible = False
+lblConfirmRaise.Visible = False
+cmdRaise.Visible = True
+cmdFold.Visible = True
+
+If PlayerBigBlind = True And BigBlind = CallBal Then
+
+    cmdCheck.Visible = True
+
+Else
+
+    cmdCall.Visible = True
+
+End If
+
+End Sub
+
+Private Sub lblConfirmRaise_Click()
+
+PlayerTurn = False
+HScrollBal.Visible = False
+lblConfirmRaise.Visible = False
+lblSliderBal.Visible = False
+lblBack.Visible = False
+
+If PlayerSmallBlind = True And CallBal <> SmallBlind * 2 Then
+            
+    tempSBal = HScrollBal.Value - SmallBlind
+    PlayerBal = PlayerBal - tempSBal
+    lblPlayerBal.Caption = "Balance: $" & PlayerBal
+    lblPM.Caption = "You have raised with $" & HScrollBal.Value & "."
+    Pot = Pot + CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblPM.Visible = True
+    PlayerTurn = False
+    CallBal = HScrollBal.Value
+            
+ElseIf PlayerBigBlind = True And CallBal <> BigBlind Then
+            
+    tempBBal = HScrollBal.Value - BigBlind
+    PlayerBal = PlayerBal - tempBBal
+    lblPlayerBal.Caption = "Balance: $" & PlayerBal
+    lblPM.Caption = "You have raised with $" & HScrollBal.Value & "."
+    Pot = Pot + CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblPM.Visible = True
+    PlayerTurn = False
+    CallBal = HScrollBal.Value
+            
+ElseIf HScrollBal.Value = PlayerBal Then
+            
+    CallBal = HScrollBal.Value
+    Pot = Pot + CallBal
+    PlayerBal = PlayerBal - CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblPlayerBal.Caption = "Balance: $" & PlayerBal
+    lblPM.Visible = True
+    lblPM.Caption = "You went all in with $" & CallBal & "."
+    PlayerAllIn = True
+
+Else
+
+    CallBal = HScrollBal.Value
+    Pot = Pot + CallBal
+    PlayerBal = PlayerBal - CallBal
+    lblPlayerBal.Caption = "Balance: $" & PlayerBal
+    lblPM.Visible = True
+    lblPM.Caption = "You have raised with $" & CallBal & "."
+    
+End If
+
+PlayerTime = 2
+TurnTaken = True
+
+End Sub
+
+Private Sub tmrBBlindDelay_Timer()
+
+Select Case Dealer 'big blinds
+
+    Case 1
+    
+        If Bot4Bal = 0 Then
+        
+            lblB4M.Visible = True
+            lblB4M.Caption = "Bot 4 cannot pay the big blind."
+        
+        Else
+            
+            lblB4M.Visible = True
+            lblB4M.Caption = "Bot 4 has paid the big blind of $" & BigBlind
+            Bot4Bal = Bot4Bal - BigBlind
+            lblB4B.Caption = "Balance: $" & Bot4Bal
+            Pot = Pot + BigBlind
+            lblPot.Caption = "Pot: $" & Pot
+        
+        End If
+    
+    Case 2
+
+        If Bot1Bal = 0 Then
+        
+            lblB1M.Visible = True
+            lblB1M.Caption = "Bot 1 cannot pay the big blind."
+        
+        Else
+            
+            lblB1M.Visible = True
+            lblB1M.Caption = "Bot 1 has paid the big blind of $" & BigBlind
+            Bot1Bal = Bot1Bal - BigBlind
+            lblB1B.Caption = "Balance: $" & Bot1Bal
+            Pot = Pot + BigBlind
+            lblPot.Caption = "Pot: $" & Pot
+        
+        End If
+    
+    Case 3
+
+        If Bot2Bal = 0 Then
+        
+            lblB2M.Visible = True
+            lblB2M.Caption = "Bot 2 cannot pay the big blind."
+        
+        Else
+            
+            lblB2M.Visible = True
+            lblB2M.Caption = "Bot 2 has paid the big blind of $" & BigBlind
+            Bot2Bal = Bot2Bal - BigBlind
+            lblB2B.Caption = "Balance: $" & Bot2Bal
+            Pot = Pot + BigBlind
+            lblPot.Caption = "Pot: $" & Pot
+        
+        End If
+    
+    Case 4
+
+        If PlayerBal = 0 Then
+        
+            lblPM.Visible = True
+            lblPM.Caption = "You cannot pay the big blind."
+        
+        Else
+            
+            lblPM.Visible = True
+            lblPM.Caption = "You have paid the big blind of $" & BigBlind
+            PlayerBal = PlayerBal - BigBlind
+            lblPlayerBal.Caption = "Balance: $" & PlayerBal
+            Pot = Pot + BigBlind
+            lblPot.Caption = "Pot: $" & Pot
+        
+        End If
+    
+    Case 5
+    
+        If Bot3Bal = 0 Then
+        
+            lblB3M.Visible = True
+            lblB3M.Caption = "Bot 3 has paid the big blind of $" & BigBlind
+        
+        Else
+            
+            lblB3M.Visible = True
+            lblB3M.Caption = "Bot 3 has paid the big blind of $" & BigBlind
+            Bot3Bal = Bot3Bal - BigBlind
+            lblB3B.Caption = "Balance: $" & Bot3Bal
+            Pot = Pot + BigBlind
+            lblPot.Caption = "Pot: $" & Pot
+
+        End If
+        
+End Select
+
+tmrPlayerTime.Enabled = True
+Call TurnP
+tmrBBlindDelay.Enabled = False
+
+End Sub
+
+Public Sub CheckFoldP()
+
+If PlayerFold = True And Bot1Fold = True And Bot2Fold = True And Bot3Fold = True Then 'add Pot Bal to winner and restart cards (game)
+
+    Bot4Win = True
+    MsgBox "Everyone else has folded. Bot 4 wins.", , "Notice"
+
+ElseIf PlayerFold = True And Bot1Fold = True And Bot2Fold = True And Bot4Fold = True Then
+
+    Bot3Win = True
+    MsgBox "Everyone else has folded. Bot 3 wins.", , "Notice"
+
+ElseIf PlayerFold = True And Bot1Fold = True And Bot3Fold = True And Bot4Fold = True Then
+
+    Bot2Win = True
+    MsgBox "Everyone else has folded. Bot 2 wins.", , "Notice"
+    
+ElseIf PlayerFold = True And Bot2Fold = True And Bot3Fold = True And Bot4Fold = True Then
+
+    Bot1Win = True
+    MsgBox "Everyone else has folded. Bot 1 wins.", , "Notice"
+    
+ElseIf Bot1Fold = True And Bot2Fold = True And Bot3Fold = True And Bot4Fold = True Then
+
+    PlayerWin = True
+    MsgBox "Everyone else has folded. Player wins.", , "Notice"
+
+Else
+
+    Call TurnP
+
+End If
+
+End Sub
+Private Sub tmrBot1TurnDelay_Timer()
+
+Call Bot1TurnP
+tmrBot1TurnDelay.Enabled = False
+
+End Sub
+
+Private Sub tmrBot2TurnDelay_Timer()
+
+Call Bot2TurnP
+tmrBot2TurnDelay.Enabled = False
+
+End Sub
+
+Private Sub tmrBot3TurnDelay_Timer()
+
+Call Bot3TurnP
+tmrBot3TurnDelay.Enabled = False
+
+End Sub
+
+Private Sub tmrBot4TurnDelay_Timer()
+
+Call Bot4TurnP
+tmrBot4TurnDelay.Enabled = False
+
+End Sub
+
+Private Sub tmrPlayerTime_Timer()
+
+If imgRiver.Visible = False Then
+
+    tmrPlayerTime.Enabled = False
+    tmrBot1TurnDelay.Enabled = False
+    tmrBot2TurnDelay.Enabled = False
+    tmrBot3TurnDelay.Enabled = False
+    tmrBot4TurnDelay.Enabled = False
+
+Else
+
+PlayerTime = PlayerTime - 1
+lblPlayerTime.Caption = PlayerTime
+
+If PlayerFold = True And PlayerTurn = True Then
+
+    PlayerTurn = False
+    PlayerTime = 20
+    Turn = Turn + 1
+    
+    If Turn = 6 Then
+    
+        Turn = 1
+    
+    End If
+    
+    MsgBox "Player has folded. Skipped Turn", , "Notice"
+    lblPM.Caption = "You have folded."
+    
+    tmrTurnDelay.Enabled = True
+    tmrPlayerTime.Enabled = False
+
+End If
+
+If PlayerTime = 0 And PlayerTurn = False Then
+
+    PlayerTime = 20
+    Turn = Turn + 1
+    roundCounter = roundCounter + 1
+    
+    If Turn = 6 Then
+    
+        Turn = 1
+    
+    End If
+    
+    lblPlayerTime.Caption = PlayerTime
+    
+    If FirstRoundBet = False And roundCounter = 5 And SecondRoundBet = False Then
+
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+        imgFirstCard.Visible = False
+        imgSecondCard.Visible = False
+        imgThirdCard.Visible = False
+        FirstRoundBet = True
+        roundCounter = 0
+    
+    End If
+    
+    If FirstRoundBet = True And roundCounter = 5 - FoldCounter And SecondRoundBet = False Then
+    
+        imgTurn.Visible = False
+        roundCounter = 0
+        SecondRoundBet = True
+        FirstRoundBet = False
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+    
+    End If
+    
+    If SecondRoundBet = True And roundCounter = 5 - FoldCounter And FirstRoundBet = False Then
+    
+        imgRiver.Visible = False
+        SecondRoundBet = False
+        lblPlayerTime.Caption = PlayerTime
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+        roundCounter = 0
+        PlayerTime = 20
+        tmrPlayerTime.Enabled = False
+        Call PokerHandsP
+    
+    End If
+    
+    MsgBox "Turn Over.", , "Notice"
+    'Call DealerP
+    tmrTurnDelay.Enabled = True
+    tmrPlayerTime.Enabled = False
+
+End If
+
+If PlayerTime = 0 And PlayerTurn = True And TurnTaken = True Then
+
+    PlayerTime = 20
+    Turn = Turn + 1
+    roundCounter = roundCounter + 1
+    
+    If Turn = 6 Then
+    
+        Turn = 1
+    
+    End If
+    
+    lblPlayerTime.Caption = PlayerTime
+    
+    If FirstRoundBet = False And roundCounter = 5 And SecondRoundBet = False Then
+
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+        imgFirstCard.Visible = False
+        imgSecondCard.Visible = False
+        imgThirdCard.Visible = False
+        FirstRoundBet = True
+        roundCounter = 0
+    
+    End If
+    
+    If FirstRoundBet = True And roundCounter = 5 - FoldCounter And SecondRoundBet = False Then
+    
+        imgTurn.Visible = False
+        SecondRoundBet = True
+        FirstRoundBet = False
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+        roundCounter = 0
+    
+    End If
+    
+    If SecondRoundBet = True And roundCounter = 5 - FoldCounter And FirstRoundBet = False Then
+    
+        imgRiver.Visible = False
+        SecondRoundBet = False
+        lblPlayerTime.Caption = PlayerTime
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+        roundCounter = 0
+        PlayerTime = 20
+        tmrPlayerTime.Enabled = False
+        Call PokerHandsP
+    
+    End If
+    
+    MsgBox "Turn Over.", , "Notice"
+    'Call DealerP
+    tmrTurnDelay.Enabled = True
+    tmrPlayerTime.Enabled = False
+
+End If
+
+If PlayerTime = 0 And PlayerTurn = True And TurnTaken = False Then
+
+    PlayerTime = 20
+    Turn = Turn + 1
+    roundCounter = roundCounter + 1
+    
+    If Turn = 6 Then
+    
+        Turn = 1
+    
+    End If
+    
+    If FirstRoundBet = False And roundCounter = 5 And SecondRoundBet = False Then
+
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+        imgFirstCard.Visible = False
+        imgSecondCard.Visible = False
+        imgThirdCard.Visible = False
+        FirstRoundBet = True
+        roundCounter = 0
+    
+    End If
+    
+    If FirstRoundBet = True And roundCounter = 5 - FoldCounter And SecondRoundBet = False Then
+    
+        imgTurn.Visible = False
+        roundCounter = 0
+        SecondRoundBet = True
+        FirstRoundBet = False
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+    
+    End If
+    
+    If SecondRoundBet = True And roundCounter = 5 - FoldCounter And FirstRoundBet = False Then
+    
+        imgRiver.Visible = False
+        SecondRoundBet = False
+        lblPlayerTime.Caption = PlayerTime
+        lblPM.Visible = False
+        lblB1M.Visible = False
+        lblB2M.Visible = False
+        lblB3M.Visible = False
+        lblB4M.Visible = False
+        roundCounter = 0
+        PlayerTime = 20
+        tmrPlayerTime.Enabled = False
+        Call PokerHandsP
+    
+    End If
+    
+    cmdCall.Visible = False
+    cmdCheck.Visible = False
+    cmdRaise.Visible = False
+    cmdFold.Visible = False
+    MsgBox "You have missed your turn. Automatically folded.", , "Notice"
+    FoldCounter = FoldCounter + 1
+    lblPM.Visible = True
+    lblSliderBal.Visible = False
+    HScrollBal.Visible = False
+    lblConfirmRaise.Visible = False
+    lblBack.Visible = False
+    lblPM.Caption = "You have folded."
+    PlayerFold = True
+    imgPB2.Visible = True
+    imgPB1.Visible = True
+    TurnTaken = True
+    PlayerTurn = False
+    
+    MsgBox "Turn Over.", , "Notice"
+    'Call DealerP
+    tmrTurnDelay.Enabled = True
+    tmrPlayerTime.Enabled = False
+
+End If
+
+End If
+
+End Sub
+
+Private Sub tmrReset_Timer()
+
+FirstRoundBet = False
+SecondRoundBet = False
+lblGameWinM.Visible = False
+lblGameWinM.Caption = ""
+PlayerFold = False
+Bot1Fold = False
+Bot2Fold = False
+Bot3Fold = False
+Bot4Fold = False
+
+For x = 1 To 2
+
+    imgBot1Card(x).Visible = True
+    imgBot2Card(x).Visible = True
+    imgBot3Card(x).Visible = True
+    imgBot4Card(x).Visible = True
+    imgPlayerCard(x).Visible = True
+    
+Next x
+
+imgB1B1.Left = 10440
+imgB1B1.Top = 2640
+imgB1B2.Left = 11040
+imgB1B2.Top = 3480
+imgB2B1.Left = 11040
+imgB2B1.Top = 5640
+imgB2B2.Left = 10440
+imgB2B2.Top = 6240
+imgB3B1.Left = 2400
+imgB3B1.Top = 5760
+imgB3B2.Left = 3000
+imgB3B2.Top = 6240
+imgB4B1.Left = 3000
+imgB4B1.Top = 2640
+imgB4B2.Left = 2400
+imgB4B2.Top = 3240
+FoldCounter = 0
+rndCounter = 0
+lblPM.Visible = False
+lblB1M.Visible = False
+lblB2M.Visible = False
+lblB3M.Visible = False
+lblB4M.Visible = False
+PairCounter = 0
+PairCounter1 = 0
+PairCounter2 = 0
+PairCounter3 = 0
+PairCounter4 = 0
+ThreeCounter = 0
+ThreeCounter1 = 0
+ThreeCounter2 = 0
+ThreeCounter3 = 0
+ThreeCounter4 = 0
+PlayerWin = False
+Bot1Win = False
+Bot2Win = False
+Bot3Win = False
+Bot4Win = False
+Call DealerP
+tmrSBlindDelay.Enabled = True
+Call RandomCardsP
+imgB1B1.Visible = True
+imgB1B2.Visible = True
+imgB2B1.Visible = True
+imgB2B2.Visible = True
+imgB3B1.Visible = True
+imgB3B2.Visible = True
+imgB4B1.Visible = True
+imgB4B2.Visible = True
+imgFirstCard.Visible = True
+imgSecondCard.Visible = True
+imgThirdCard.Visible = True
+imgTurn.Visible = True
+imgRiver.Visible = True
+tmrReset.Enabled = False
+
+End Sub
+
+Private Sub tmrSBlindDelay_Timer()
+
+Select Case Dealer 'small blinds
+
+    Case 1
+    
+        If Bot3Bal = 0 Then
+        
+            lblB3M.Visible = True
+            lblB3M.Caption = "Bot 3 cannot pay the small blind."
+        
+        Else
+
+            lblB3M.Visible = True
+            lblB3M.Caption = "Bot 3 has paid the small blind of $" & SmallBlind
+            Bot3Bal = Bot3Bal - SmallBlind
+            lblB3B.Caption = "Balance: $" & Bot3Bal
+            Pot = Pot + SmallBlind
+            lblPot.Caption = "Pot: $" & Pot
+        
+        End If
+    
+    Case 2
+
+        If Bot4Bal = 0 Then
+        
+            lblB4M.Visible = True
+            lblB4M.Caption = "Bot 4 cannot pay the small blind."
+        
+        Else
+    
+            lblB4M.Visible = True
+            lblB4M.Caption = "Bot 4 has paid the small blind of $" & SmallBlind
+            Bot4Bal = Bot4Bal - SmallBlind
+            lblB4B.Caption = "Balance: $" & Bot4Bal
+            Pot = Pot + SmallBlind
+            lblPot.Caption = "Pot: $" & Pot
+    
+        End If
+        
+    Case 3
+
+        If Bot1Bal = 0 Then
+        
+            lblB1M.Visible = True
+            lblB1M.Caption = "Bot 1 cannot pay the small blind."
+        
+        Else
+        
+            lblB1M.Visible = True
+            lblB1M.Caption = "Bot 1 has paid the small blind of $" & SmallBlind
+            Bot1Bal = Bot1Bal - SmallBlind
+            lblB1B.Caption = "Balance: $" & Bot1Bal
+            Pot = Pot + SmallBlind
+            lblPot.Caption = "Pot: $" & Pot
+        
+        End If
+    
+    Case 4
+
+        
+        If Bot2Bal = 0 Then
+
+            lblB2M.Visible = True
+            lblB2M.Caption = "Bot 2 cannot pay the small blind."
+        
+        Else
+        
+            lblB2M.Visible = True
+            lblB2M.Caption = "Bot 2 has paid the small blind of $" & SmallBlind
+            Bot2Bal = Bot2Bal - SmallBlind
+            lblB2B.Caption = "Balance: $" & Bot2Bal
+            Pot = Pot + SmallBlind
+            lblPot.Caption = "Pot: $" & Pot
+        
+        End If
+    
+    Case 5
+    
+        If PlayerBal = 0 Then
+        
+            lblB2M.Visible = True
+            lblB2M.Caption = "You cannot pay the small blind."
+        
+        Else
+
+            lblPM.Visible = True
+            lblPM.Caption = "You have paid the small blind of $" & SmallBlind
+            PlayerBal = PlayerBal - SmallBlind
+            lblPlayerBal.Caption = "Balance: $" & PlayerBal
+            Pot = Pot + SmallBlind
+            lblPot.Caption = "Pot: $" & Pot
+            
+        End If
+
+End Select
+
+tmrBBlindDelay.Enabled = True
+tmrSBlindDelay.Enabled = False
+
+End Sub
+
+Private Sub tmrTime_Timer()
+
+GameTimeS = GameTimeS + 1 'display time
+
+If GameTimeS = 60 Then
+
+    GameTimeM = GameTimeM + 1
+    GameTimeS = 0
+    
+End If
+
+If GameTimeS < 10 Then
+
+    tempGameTimeS = "0" & GameTimeS
+
+ElseIf GameTimeS >= 10 Then
+
+    tempGameTimeS = GameTimeS
+    
+End If
+
+If GameTimeM < 10 Then
+
+    tempGameTimeM = "0" & GameTimeM
+
+ElseIf GameTimeM >= 10 Then
+
+    tempGameTimeM = GameTimeM
+    
+End If
+    
+lblTime.Caption = tempGameTimeM & ":" & tempGameTimeS
+
+Select Case lblTime.Caption 'increasing blinds
+
+    Case "02:00"
+    
+        BigBlind = 20
+        SmallBlind = 10
+        MsgBox "Big Blind has increased to $20 and Small Blind has increased to $10", , "Notice"
+    
+    Case "04:00"
+    
+        BigBlind = 50
+        SmallBlind = 25
+        MsgBox "Big Blind has increased to $50 and Small Blind has increased to $25", , "Notice"
+
+    Case "06:00"
+    
+        BigBlind = 100
+        SmallBlind = 50
+        MsgBox "Big Blind has increased to 100 and Small Blind has increased to $50", , "Notice"
+        
+    Case "08:00"
+    
+        BigBlind = 200
+        SmallBlind = 100
+        MsgBox "Big Blind has increased to $200 and Small Blind has increased to $100", , "Notice"
+
+    Case "10:00"
+    
+        BigBlind = 500
+        SmallBlind = 250
+        MsgBox "Big Blind has increased to $500 and Small Blind has increased to $250", , "Notice"
+
+    Case "12:00"
+    
+        BigBlind = 1000
+        SmallBlind = 500
+        MsgBox "Big Blind has increased to $1000 and Small Blind has increased to $500", , "Notice"
+    
+    Case "14:00"
+    
+        BigBlind = 4000
+        SmallBlind = 2000
+        MsgBox "Big Blind has increased to $4000 and Small Blind has increased to $2000", , "Notice"
+        
+End Select
+
+End Sub
+
+Public Sub DealerP() 'dealer
+
+PlayerDealer = False
+Bot1Dealer = False
+Bot2Dealer = False
+Bot3Dealer = False
+Bot4Dealer = False
+
+Dealer = Dealer + 1
+
+Select Case Dealer
+
+    Case 1
+    
+        PlayerDealer = True
+        lblTurn.Caption = "Bot 1's Turn"
+        imgDealer.Left = 8160
+        imgDealer.Top = 6600
+        imgBigBlind.Left = 3960
+        imgBigBlind.Top = 2760
+        imgSmallBlind.Left = 3960
+        imgSmallBlind.Top = 6360
+        Bot3SmallBlind = True
+        Bot4BigBlind = True
+        Bot1Turn = True
+        Turn = 4
+    
+    Case 2
+    
+        Bot3Dealer = True
+        lblTurn.Caption = "Bot 2's Turn"
+        imgDealer.Left = 3360
+        imgDealer.Top = 5280
+        imgSmallBlind.Left = 3960
+        imgSmallBlind.Top = 2760
+        imgBigBlind.Left = 9360
+        imgBigBlind.Top = 2760
+        Bot4SmallBlind = True
+        Bot1BigBlind = True
+        Bot2Turn = True
+        Turn = 5
+    
+    Case 3
+    
+        Bot4Dealer = True
+        lblTurn.Caption = "Player's Turn"
+        imgDealer.Left = 3360
+        imgDealer.Top = 3960
+        imgSmallBlind.Left = 9360
+        imgSmallBlind.Top = 2760
+        imgBigBlind.Left = 9360
+        imgBigBlind.Top = 6360
+        Bot1SmallBlind = True
+        Bot2BigBlind = True
+        PlayerTurn = True
+        Turn = 1
+    
+    Case 4
+    
+        Bot2Dealer = True
+        lblTurn.Caption = "Bot 3's Turn"
+        imgDealer.Left = 10080
+        imgDealer.Top = 5280
+        imgSmallBlind.Left = 9360
+        imgSmallBlind.Top = 6360
+        imgBigBlind.Left = 5160
+        imgBigBlind.Top = 6720
+        Bot2SmallBlind = True
+        PlayerBigBlind = True
+        Bot3Turn = True
+        Turn = 2
+        
+    Case 5
+    
+        Bot1Dealer = True
+        lblTurn.Caption = "Bot 4's Turn"
+        imgDealer.Left = 10080
+        imgDealer.Top = 3960
+        imgSmallBlind.Left = 5160
+        imgSmallBlind.Top = 6720
+        imgBigBlind.Left = 3960
+        imgBigBlind.Top = 6360
+        PlayerSmallBlind = True
+        Bot3BigBlind = True
+        Bot4Turn = True
+        Turn = 3
+    
+    Case 6
+    
+        Dealer = 1
+        PlayerDealer = True
+        lblTurn.Caption = "Bot 1's Turn"
+        imgDealer.Left = 8160
+        imgDealer.Top = 6600
+        imgBigBlind.Left = 3960
+        imgBigBlind.Top = 2760
+        imgSmallBlind.Left = 3960
+        imgSmallBlind.Top = 6360
+        Bot3SmallBlind = True
+        Bot4BigBlind = True
+        Bot1Turn = True
+        Turn = 4
+
+End Select
+
+'tmrSBlindDelay.Enabled = True
+
+End Sub
+
+Public Sub TurnP()
+
+If Turn = 2 And Bot3Fold = False Then 'after player's turn
+
+    Bot3Turn = True
+    lblTurn.Caption = "Bot 3's Turn"
+    tmrPlayerTime.Enabled = True
+    tmrBot3TurnDelay.Enabled = True
+
+ElseIf Turn = 2 And Bot3Fold = True Then
+
+    Turn = 3
+    
+    If Turn = 3 And Bot4Fold = False Then
+    
+        Bot4Turn = True
+        lblTurn.Caption = "Bot 4's Turn"
+        tmrPlayerTime.Enabled = True
+        tmrBot4TurnDelay.Enabled = True
+    
+    ElseIf Turn = 3 And Bot4Fold = True Then
+    
+        Turn = 4
+        
+        If Turn = 4 And Bot1Fold = False Then
+        
+            Bot1Turn = True
+            tmrPlayerTime.Enabled = True
+            lblTurn.Caption = "Bot 1's Turn"
+            tmrBot1TurnDelay.Enabled = True
+            
+        ElseIf Turn = 4 And Bot1Fold = True Then
+        
+            Turn = 5
+            
+            If Turn = 5 And Bot2Fold = False Then
+            
+                Bot2Turn = True
+                tmrPlayerTime.Enabled = True
+                lblTurn.Caption = "Bot 2's Turn"
+                tmrBot2TurnDelay.Enabled = True
+            
+            ElseIf Turn = 5 And Bot2Fold = True Then
+            
+                Turn = 1
+                
+                If Turn = 1 And PlayerFold = False Then
+                    
+                    PlayerTurn = True
+                    tmrPlayerTime.Enabled = True
+                    lblTurn.Caption = "Player's Turn"
+                    Call PlayerTurnP
+                
+                End If
+            
+            End If
+        
+        End If
+    
+    End If
+
+End If
+
+If Turn = 3 And Bot4Fold = False Then 'after bot3's turn
+
+    Bot4Turn = True
+    lblTurn.Caption = "Bot 4's Turn"
+    tmrPlayerTime.Enabled = True
+    tmrBot4TurnDelay.Enabled = True
+
+ElseIf Turn = 3 And Bot4Fold = True Then
+
+    Turn = 4
+    
+    If Turn = 4 And Bot1Fold = False Then
+    
+        Bot1Turn = True
+        tmrPlayerTime.Enabled = True
+        lblTurn.Caption = "Bot 1's Turn"
+        tmrBot1TurnDelay.Enabled = True
+    
+    ElseIf Turn = 4 And Bot1Fold = True Then
+    
+        Turn = 5
+        
+        If Turn = 5 And Bot2Fold = False Then
+        
+            Bot2Turn = True
+            tmrPlayerTime.Enabled = True
+            lblTurn.Caption = "Bot 2's Turn"
+            tmrBot2TurnDelay.Enabled = True
+            
+        ElseIf Turn = 5 And Bot2Fold = True Then
+        
+            Turn = 1
+            
+            If Turn = 1 And PlayerFold = False Then
+            
+                PlayerTurn = True
+                tmrPlayerTime.Enabled = True
+                lblTurn.Caption = "Player's Turn"
+                Call PlayerTurnP
+            
+            ElseIf Turn = 1 And PlayerFold = True Then
+            
+                Turn = 2
+                
+                If Turn = 2 And Bot3Fold = False Then
+                    
+                    Bot3Turn = True
+                    lblTurn.Caption = "Bot 3's Turn"
+                    tmrPlayerTime.Enabled = True
+                    tmrBot3TurnDelay.Enabled = True
+                
+                End If
+            
+            End If
+        
+        End If
+    
+    End If
+
+End If
+
+If Turn = 4 And Bot1Fold = False Then 'after bot4's turn
+
+    Bot1Turn = True
+    tmrPlayerTime.Enabled = True
+    lblTurn.Caption = "Bot 1's Turn"
+    tmrBot1TurnDelay.Enabled = True
+    
+
+ElseIf Turn = 4 And Bot1Fold = True Then
+
+    Turn = 5
+    
+    If Turn = 5 And Bot2Fold = False Then
+    
+        Bot2Turn = True
+        tmrPlayerTime.Enabled = True
+        lblTurn.Caption = "Bot 2's Turn"
+        tmrBot2TurnDelay.Enabled = True
+    
+    ElseIf Turn = 5 And Bot2Fold = True Then
+    
+        Turn = 1
+        
+        If Turn = 1 And PlayerFold = False Then
+        
+            PlayerTurn = True
+            tmrPlayerTime.Enabled = True
+            lblTurn.Caption = "Player's Turn"
+            Call PlayerTurnP
+            
+        ElseIf Turn = 1 And PlayerFold = True Then
+        
+            Turn = 2
+            
+            If Turn = 2 And Bot3Fold = False Then
+            
+                Bot3Turn = True
+                lblTurn.Caption = "Bot 3's Turn"
+                tmrPlayerTime.Enabled = True
+                tmrBot3TurnDelay.Enabled = True
+            
+            ElseIf Turn = 2 And Bot3Fold = True Then
+            
+                Turn = 3
+                
+                If Turn = 3 And Bot4Fold = False Then
+                    
+                    Bot4Turn = True
+                    lblTurn.Caption = "Bot 4's Turn"
+                    tmrPlayerTime.Enabled = True
+                    tmrBot4TurnDelay.Enabled = True
+                
+                End If
+            
+            End If
+        
+        End If
+    
+    End If
+
+End If
+
+If Turn = 5 And Bot2Fold = False Then 'after bot1's turn
+
+    Bot2Turn = True
+    tmrPlayerTime.Enabled = True
+    lblTurn.Caption = "Bot 2's Turn"
+    tmrBot2TurnDelay.Enabled = True
+
+ElseIf Turn = 5 And Bot2Fold = True Then
+
+    Turn = 1
+    
+    If Turn = 1 And PlayerFold = False Then
+    
+        PlayerTurn = True
+        tmrPlayerTime.Enabled = True
+        lblTurn.Caption = "Player's Turn"
+        Call PlayerTurnP
+    
+    ElseIf Turn = 1 And PlayerFold = True Then
+    
+        Turn = 2
+        
+        If Turn = 2 And Bot3Fold = False Then
+        
+            Bot3Turn = True
+            lblTurn.Caption = "Bot 3's Turn"
+            tmrPlayerTime.Enabled = True
+            tmrBot3TurnDelay.Enabled = True
+            
+        ElseIf Turn = 2 And Bot3Fold = True Then
+        
+            Turn = 3
+            
+            If Turn = 3 And Bot4Fold = False Then
+            
+                Bot4Turn = True
+                lblTurn.Caption = "Bot 4's Turn"
+                tmrPlayerTime.Enabled = True
+                tmrBot4TurnDelay.Enabled = True
+            
+            ElseIf Turn = 3 And Bot4Fold = True Then
+            
+                Turn = 4
+                
+                If Turn = 4 And Bot1Fold = False Then
+                    
+                    Bot1Turn = True
+                    tmrPlayerTime.Enabled = True
+                    lblTurn.Caption = "Bot 1's Turn"
+                    tmrBot1TurnDelay.Enabled = True
+                
+                End If
+            
+            End If
+        
+    
+        End If
+    
+    End If
+
+End If
+
+If Turn = 1 And PlayerFold = False Then 'after bot2's turn
+
+    PlayerTurn = True
+    tmrPlayerTime.Enabled = True
+    lblTurn.Caption = "Player's Turn"
+    Call PlayerTurnP
+
+ElseIf Turn = 1 And PlayerFold = True Then
+
+    Turn = 2
+    
+    If Turn = 2 And Bot3Fold = False Then
+    
+        Bot3Turn = True
+        tmrPlayerTime.Enabled = True
+        lblTurn.Caption = "Bot 3's Turn"
+        Call Bot3TurnP
+        
+    ElseIf Turn = 2 And Bot3Fold = True Then
+    
+        Turn = 3
+        
+        If Turn = 3 And Bot4Fold = False Then
+        
+            Bot4Turn = True
+            lblTurn.Caption = "Bot 4's Turn"
+            tmrPlayerTime.Enabled = True
+            tmrBot4TurnDelay.Enabled = True
+            
+        ElseIf Turn = 3 And Bot4Fold = True Then
+        
+            Turn = 4
+            
+            If Turn = 4 And Bot1Fold = False Then
+            
+                Bot1Turn = True
+                tmrPlayerTime.Enabled = True
+                lblTurn.Caption = "Bot 1's Turn"
+                tmrBot1TurnDelay.Enabled = True
+            
+            ElseIf Turn = 4 And Bot1Fold = True Then
+            
+                Turn = 5
+                
+                If Turn = 5 And Bot2Fold = False Then
+                    
+                    Bot2Turn = True
+                    tmrPlayerTime.Enabled = True
+                    lblTurn.Caption = "Bot 2's Turn"
+                    tmrBot2TurnDelay.Enabled = True
+                
+                End If
+            
+            End If
+        
+    
+        End If
+    
+    End If
+
+End If
+
+End Sub
+
+Public Sub PlayerTurnP()
+
+If PlayerBal = 0 And PlayerAllIn = True Then
+
+    PlayerTime = 2
+    lblPM.Visible = True
+    lblPM.Caption = "No money left. You went all in."
+    cmdCheck.Visible = False
+    cmdCall.Visible = False
+    cmdFold.Visible = False
+    cmdRaise.Visible = False
+
+End If
+
+If PlayerBigBlind = True And BigBlind = CallBal Then
+
+    cmdCheck.Visible = True
+    cmdCall.Visible = False
+    cmdFold.Visible = True
+    cmdRaise.Visible = True
+    cmdRaise.Left = 1800
+    cmdCheck.Left = 5760
+    cmdFold.Left = 9600
+
+Else
+
+    cmdCheck.Visible = False
+    cmdCall.Visible = True
+    cmdFold.Visible = True
+    cmdRaise.Visible = True
+    cmdRaise.Left = 1800
+    cmdCall.Left = 5760
+    cmdFold.Left = 9600
+    
+End If
+
+End Sub
+
+Public Sub Bot1TurnP()
+
+If Bot1Bal = 0 And Bot1AllIn = True Then
+
+    PlayerTime = 2
+    lblB1M.Visible = True
+    lblB1M.Caption = "No money left. Bot 1 went all in."
+
+Else
+
+Randomize
+rndTurn = Rnd * 5 + 1
+
+If rndTurn = 1 Then 'fold
+    
+    Bot1Fold = True
+    imgB1B1.Top = 3000
+    imgB1B1.Left = 10800
+    imgB1B2.Top = 3000
+    imgB1B2.Left = 10800
+    imgBot1Card(1).Visible = False
+    imgBot1Card(2).Visible = False
+    lblB1M.Caption = "Bot 1 has folded."
+    lblB1M.Visible = True
+    Bot1Turn = False
+    FoldCounter = FoldCounter + 1
+
+End If
+
+If rndTurn = 2 Then 'raise
+
+    If Bot1Bal > CallBal + 1000 Then
+
+        rndRaise = Rnd * 999 + 1
+        tempRaise = CallBal + rndRaise
+        
+        If tempRaise >= Bot1Bal Then 'all in/raise
+
+            tempRaise = Bot1Bal
+            CallBal = tempRaise
+            Bot1Bal = Bot1Bal - tempRaise
+            lblB1M.Caption = "Bot 1 is going all in."
+            lblB1B.Caption = "Balance: $" & Bot1Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB1M.Visible = True
+            Bot1Turn = False
+            Bot1AllIn = True
+        
+        Else
+                
+            If Bot1SmallBlind = True And CallBal = SmallBlind * 2 Then
+            
+                Bot1SmallBlind = False
+                tempSBal = tempRaise - SmallBlind
+                Bot1Bal = Bot1Bal - tempSBal
+                lblB1B.Caption = "Balance: $" & Bot1Bal
+                lblB1M.Caption = "Bot 1 has raised with $" & tempRaise & "."
+                lblPot.Caption = "Pot: $" & Pot
+                Pot = Pot + CallBal
+                lblB1M.Visible = True
+                Bot1Turn = False
+                CallBal = tempRaise
+            
+            ElseIf Bot1BigBlind = True And CallBal <> BigBlind Then
+            
+                Bot1BigBlind = False
+                tempBBal = tempRaise - BigBlind
+                Bot1Bal = Bot1Bal - tempBBal
+                lblB1B.Caption = "Balance: $" & Bot1Bal
+                lblB1M.Caption = "Bot 1 has raised with $" & tempRaise & "."
+                lblPot.Caption = "Pot: $" & Pot
+                Pot = Pot + CallBal
+                lblB1M.Visible = True
+                Bot1Turn = False
+                CallBal = tempRaise
+            
+            Else
+            
+                CallBal = tempRaise
+                Bot1Bal = Bot1Bal - tempRaise
+                lblB1B.Caption = "Balance: $" & Bot1Bal
+                lblB1M.Caption = "Bot 1 has raised with $" & tempRaise & "."
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB1M.Visible = True
+                Bot1Turn = False
+            
+            End If
+        
+        End If
+    
+    Else
+    
+        If Bot1Bal > CallBal Then
+    
+            If Bot1BigBlind = True And CallBal = BigBlind Then 'check
+    
+                Bot1BigBlind = False
+                lblB1M.Caption = "Bot 1 has checked."
+                lblB1M.Visible = True
+                Bot1Turn = False
+            
+            ElseIf Bot1SmallBlind = True And CallBal = SmallBlind * 2 Then
+            
+                Bot1SmallBlind = False
+                tempSBal = CallBal - SmallBlind
+                Bot1Bal = Bot1Bal - tempSBal
+                Pot = Pot + CallBal
+                lblB1B.Caption = "Balance: $" & Bot1Bal
+                lblB1M.Caption = "Bot 1 has called."
+                lblPot.Caption = "Pot: $" & Pot
+                lblB1M.Visible = True
+                Bot1Turn = False
+    
+            Else
+        
+                Bot1Bal = Bot1Bal - CallBal 'call
+                lblB1B.Caption = "Balance: $" & Bot1Bal
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB1M.Caption = "Bot 1 has called."
+                lblB1M.Visible = True
+                Bot1Turn = False
+    
+            End If
+
+        ElseIf Bot1Bal < CallBal Then
+        
+            CallBal = Bot1Bal
+            Bot1Bal = Bot1Bal - CallBal 'call
+            lblB1B.Caption = "Balance: $" & Bot1Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB1M.Caption = "Bot 1 is going all in."
+            lblB1M.Visible = True
+            Bot1Turn = False
+            Bot1AllIn = True
+        
+        End If
+
+    End If
+    
+End If
+
+If rndTurn = 3 Or rndTurn = 5 Or rndTurn = 6 Then 'call/check
+
+    If Bot1Bal > CallBal Then
+    
+        If Bot1BigBlind = True And CallBal = BigBlind Then 'check
+    
+            Bot1BigBlind = False
+            lblB1M.Caption = "Bot 1 has checked."
+            lblB1M.Visible = True
+            Bot1Turn = False
+            
+        ElseIf Bot1SmallBlind = True And CallBal = SmallBlind * 2 Then
+        
+            Bot1SmallBlind = False
+            tempSBal = CallBal - SmallBlind
+            Bot1Bal = Bot1Bal - tempSBal
+            Pot = Pot + CallBal
+            lblB1B.Caption = "Balance: $" & Bot1Bal
+            lblB1M.Caption = "Bot 1 has called."
+            lblPot.Caption = "Pot: $" & Pot
+            lblB1M.Visible = True
+            Bot1Turn = False
+    
+        Else
+        
+            Bot1Bal = Bot1Bal - CallBal 'call
+            lblB1B.Caption = "Balance: $" & Bot1Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB1M.Caption = "Bot 1 has called."
+            lblB1M.Visible = True
+            Bot1Turn = False
+    
+        End If
+    
+    ElseIf Bot1Bal <= CallBal Then
+    
+        CallBal = Bot1Bal
+        Bot1Bal = Bot1Bal - CallBal 'call
+        lblB1B.Caption = "Balance: $" & Bot1Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB1M.Caption = "Bot 1 is going all in."
+        lblB1M.Visible = True
+        Bot1Turn = False
+        Bot1AllIn = True
+    
+    End If
+
+End If
+
+If rndTurn = 4 And Bot1Bal <= 3000 Then 'all in
+
+    CallBal = Bot1Bal
+    Bot1Bal = Bot1Bal - CallBal 'call
+    lblB1B.Caption = "Balance: $" & Bot1Bal
+    Pot = Pot + CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblB1M.Caption = "Bot 1 is going all in."
+    lblB1M.Visible = True
+    Bot1Turn = False
+    Bot1AllIn = True
+
+ElseIf rndTurn = 4 And Bot1Bal > 3000 Then 'call
+    
+    If Bot1BigBlind = True And CallBal = BigBlind Then 'check
+    
+        Bot1BigBlind = False
+        lblB1M.Caption = "Bot 1 has checked."
+        lblB1M.Visible = True
+        Bot1Turn = False
+        
+    ElseIf Bot1Bal <= CallBal Then
+    
+        CallBal = Bot1Bal
+        Bot1Bal = Bot1Bal - CallBal 'call
+        lblB1B.Caption = "Balance: $" & Bot1Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB1M.Caption = "Bot 1 is going all in."
+        lblB1M.Visible = True
+        Bot1Turn = False
+        Bot1AllIn = True
+    
+    Else
+        
+        Bot1Bal = Bot1Bal - CallBal 'call
+        lblB1B.Caption = "Balance: $" & Bot1Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB1M.Caption = "Bot 1 has called."
+        lblB1M.Visible = True
+        Bot1Turn = False
+    
+    End If
+
+End If
+
+PlayerTime = 2
+
+End If
+
+End Sub
+
+Public Sub Bot2TurnP()
+
+If Bot2Bal = 0 And Bot2AllIn = True Then
+
+    PlayerTime = 2
+    lblB2M.Visible = True
+    lblB2M.Caption = "No money left. Bot 2 went all in."
+
+Else
+
+Randomize
+rndTurn = Rnd * 5 + 1
+
+If rndTurn = 1 Then
+    
+    Bot2Fold = True
+    imgB2B1.Top = 5880
+    imgB2B1.Left = 10800
+    imgB2B2.Top = 5880
+    imgB2B2.Left = 10800
+    imgBot2Card(1).Visible = False
+    imgBot2Card(2).Visible = False
+    lblB2M.Visible = True
+    lblB2M.Caption = "Bot 2 has folded."
+    Bot2Turn = False
+    FoldCounter = FoldCounter + 1
+
+End If
+
+If rndTurn = 2 Then 'raise
+
+    If Bot2Bal > CallBal + 1000 Then
+
+        rndRaise = Rnd * 999 + 1
+        tempRaise = CallBal + rndRaise
+        
+        If tempRaise >= Bot2Bal Then 'all in/raise
+
+            tempRaise = Bot2Bal
+            CallBal = tempRaise
+            Bot2Bal = Bot2Bal - tempRaise
+            lblB2M.Caption = "Bot 2 is going all in."
+            lblB2B.Caption = "Balance: $" & Bot2Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB2M.Visible = True
+            Bot2Turn = False
+            Bot2AllIn = True
+            
+        Else
+                
+            If Bot2SmallBlind = True And CallBal = SmallBlind * 2 Then
+            
+                Bot2SmallBlind = False
+                tempSBal = tempRaise - SmallBlind
+                Bot2Bal = Bot2Bal - tempSBal
+                lblB2B.Caption = "Balance: $" & Bot2Bal
+                lblB2M.Caption = "Bot 2 has raised with $" & tempRaise & "."
+                lblPot.Caption = "Pot: $" & Pot
+                Pot = Pot + CallBal
+                lblB2M.Visible = True
+                Bot2Turn = False
+                CallBal = tempRaise
+            
+            ElseIf Bot2BigBlind = True And CallBal <> BigBlind Then
+            
+                Bot2BigBlind = False
+                tempBBal = tempRaise - BigBlind
+                Bot2Bal = Bot2Bal - tempBBal
+                lblB2B.Caption = "Balance: $" & Bot2Bal
+                lblB2M.Caption = "Bot 2 has raised with $" & tempRaise & "."
+                lblPot.Caption = "Pot: $" & Pot
+                Pot = Pot + CallBal
+                lblB2M.Visible = True
+                Bot2Turn = False
+                CallBal = tempRaise
+            
+            Else
+            
+                CallBal = tempRaise
+                Bot2Bal = Bot2Bal - tempRaise
+                lblB2B.Caption = "Balance: $" & Bot2Bal
+                lblB2M.Caption = "Bot 2 has raised with $" & tempRaise & "."
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB2M.Visible = True
+                Bot2Turn = False
+            
+            End If
+        
+        End If
+    
+    Else
+    
+        If Bot2Bal > CallBal Then
+        
+            If Bot2BigBlind = True And CallBal = BigBlind Then 'check
+    
+                Bot2BigBlind = False
+                lblB2M.Caption = "Bot 2 has checked."
+                lblB2M.Visible = True
+                Bot2Turn = False
+            
+            ElseIf Bot2SmallBlind = True And CallBal = SmallBlind * 2 Then
+            
+                Bot2SmallBlind = False
+                tempSBal = CallBal - SmallBlind
+                Bot2Bal = Bot2Bal - tempSBal
+                Pot = Pot + CallBal
+                lblB2B.Caption = "Balance: $" & Bot2Bal
+                lblB2M.Caption = "Bot 2 has called."
+                lblPot.Caption = "Pot: $" & Pot
+                lblB2M.Visible = True
+                Bot2Turn = False
+            
+            Else
+        
+                Bot2Bal = Bot2Bal - CallBal 'call
+                lblB2B.Caption = "Balance: $" & Bot2Bal
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB2M.Caption = "Bot 2 has called."
+                lblB2M.Visible = True
+                Bot2Turn = False
+    
+            End If
+    
+        ElseIf Bot2Bal <= CallBal Then
+    
+            CallBal = Bot2Bal
+            Bot2Bal = Bot2Bal - CallBal 'call
+            lblB2B.Caption = "Balance: $" & Bot2Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB2M.Caption = "Bot 2 is going all in."
+            lblB2M.Visible = True
+            Bot2Turn = False
+            Bot2AllIn = True
+        
+        End If
+
+    End If
+    
+End If
+
+If rndTurn = 3 Or rndTurn = 5 Or rndTurn = 6 Then 'call/check
+
+    If Bot2Bal > CallBal Then
+    
+        If Bot2BigBlind = True And CallBal = BigBlind Then 'check
+    
+            Bot2BigBlind = False
+            lblB2M.Caption = "Bot 2 has checked."
+            lblB2M.Visible = True
+            Bot2Turn = False
+            
+        ElseIf Bot2SmallBlind = True And CallBal = SmallBlind * 2 Then
+        
+            Bot2SmallBlind = False
+            tempSBal = CallBal - SmallBlind
+            Bot2Bal = Bot2Bal - tempSBal
+            Pot = Pot + CallBal
+            lblB2B.Caption = "Balance: $" & Bot2Bal
+            lblB2M.Caption = "Bot 2 has called."
+            lblPot.Caption = "Pot: $" & Pot
+            lblB2M.Visible = True
+            Bot2Turn = False
+    
+        Else
+        
+            Bot2Bal = Bot2Bal - CallBal 'call
+            lblB2B.Caption = "Balance: $" & Bot2Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB2M.Caption = "Bot 2 has called."
+            lblB2M.Visible = True
+            Bot2Turn = False
+    
+        End If
+    
+    ElseIf Bot2Bal <= CallBal Then
+    
+        CallBal = Bot2Bal
+        Bot2Bal = Bot2Bal - CallBal 'call
+        lblB2B.Caption = "Balance: $" & Bot2Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB2M.Caption = "Bot 2 is going all in."
+        lblB2M.Visible = True
+        Bot2Turn = False
+        Bot2AllIn = True
+    
+    End If
+
+End If
+
+If rndTurn = 4 And Bot2Bal <= 3000 Then 'all in
+
+    CallBal = Bot2Bal
+    Bot2Bal = Bot2Bal - CallBal 'call
+    lblB2B.Caption = "Balance: $" & Bot2Bal
+    Pot = Pot + CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblB2M.Caption = "Bot 2 is going all in."
+    lblB2M.Visible = True
+    Bot2Turn = False
+    Bot2AllIn = True
+
+ElseIf rndTurn = 4 And Bot2Bal > 3000 Then 'call
+    
+    If Bot2BigBlind = True And CallBal = BigBlind Then 'check
+    
+        Bot2BigBlind = False
+        lblB2M.Caption = "Bot 2 has checked."
+        lblB2M.Visible = True
+        Bot2Turn = False
+        
+    ElseIf Bot2Bal <= CallBal Then
+    
+        CallBal = Bot2Bal
+        Bot2Bal = Bot2Bal - CallBal 'call
+        lblB2B.Caption = "Balance: $" & Bot2Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB2M.Caption = "Bot 2 is going all in."
+        lblB2M.Visible = True
+        Bot2Turn = False
+        Bot2AllIn = True
+    Else
+        
+        Bot2Bal = Bot2Bal - CallBal 'call
+        lblB2B.Caption = "Balance: $" & Bot2Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB2M.Caption = "Bot 2 has called."
+        lblB2M.Visible = True
+        Bot2Turn = False
+    
+    End If
+
+End If
+
+PlayerTime = 2
+
+End If
+
+End Sub
+
+Public Sub Bot3TurnP()
+
+If Bot3Bal = 0 And Bot3AllIn = True Then
+
+    PlayerTime = 2
+    lblB3M.Visible = True
+    lblB3M.Caption = "No money left. Bot 3 went all in."
+
+Else
+
+Randomize
+rndTurn = Rnd * 5 + 1
+
+If rndTurn = 1 Then
+    
+    Bot3Fold = True
+    imgB3B1.Top = 6000
+    imgB3B1.Left = 2760
+    imgB3B2.Top = 6000
+    imgB3B2.Left = 2760
+    imgBot3Card(1).Visible = False
+    imgBot3Card(2).Visible = False
+    lblB3M.Visible = True
+    lblB3M.Caption = "Bot 3 has folded."
+    Bot3Turn = False
+    FoldCounter = FoldCounter + 1
+
+End If
+
+If rndTurn = 2 Then 'raise
+
+    If Bot3Bal > CallBal + 1000 Then
+
+        rndRaise = Rnd * 999 + 1
+        tempRaise = CallBal + rndRaise
+        
+        If tempRaise >= Bot3Bal Then 'all in/raise
+
+            tempRaise = Bot3Bal
+            CallBal = tempRaise
+            Bot3Bal = Bot3Bal - tempRaise
+            lblB3M.Caption = "Bot 3 is going all in."
+            lblB3B.Caption = "Balance: $" & Bot3Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB3M.Visible = True
+            Bot3Turn = False
+            Bot3AllIn = True
+        
+        Else
+                
+            If Bot3SmallBlind = True And CallBal = SmallBlind * 2 Then
+            
+                Bot3SmallBlind = False
+                tempSBal = tempRaise - SmallBlind
+                Bot3Bal = Bot3Bal - tempSBal
+                Pot = Pot + CallBal
+                lblB3B.Caption = "Balance: $" & Bot3Bal
+                lblB3M.Caption = "Bot 3 has raised with $" & tempRaise & "."
+                lblPot.Caption = "Pot: $" & Pot
+                lblB3M.Visible = True
+                Bot3Turn = False
+                CallBal = tempRaise
+            
+            ElseIf Bot3BigBlind = True And CallBal <> BigBlind Then
+            
+                Bot3BigBlind = False
+                tempBBal = tempRaise - BigBlind
+                Bot3Bal = Bot3Bal - tempBBal
+                Pot = Pot + CallBal
+                lblB3B.Caption = "Balance: $" & Bot3Bal
+                lblB3M.Caption = "Bot 3 has raised with $" & tempRaise & "."
+                lblPot.Caption = "Pot: $" & Pot
+                lblB3M.Visible = True
+                Bot3Turn = False
+                CallBal = tempRaise
+            
+            Else
+            
+                CallBal = tempRaise
+                Bot3Bal = Bot3Bal - tempRaise
+                lblB3B.Caption = "Balance: $" & Bot3Bal
+                lblB3M.Caption = "Bot 3 has raised with $" & tempRaise & "."
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB3M.Visible = True
+                Bot3Turn = False
+            
+            End If
+        
+        End If
+    
+    Else
+    
+        If Bot3Bal > CallBal Then
+        
+            If Bot3BigBlind = True And CallBal = BigBlind Then 'check
+    
+                Bot3BigBlind = False
+                lblB3M.Caption = "Bot 3 has checked."
+                lblB3M.Visible = True
+                Bot3Turn = False
+            
+            ElseIf Bot3SmallBlind = True And CallBal = SmallBlind * 2 Then
+            
+                Bot3SmallBlind = False
+                tempSBal = CallBal - SmallBlind
+                Bot3Bal = Bot3Bal - tempSBal
+                lblB3B.Caption = "Balance: $" & Bot3Bal
+                lblB3M.Caption = "Bot 3 has called."
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB3M.Visible = True
+                Bot3Turn = False
+    
+            Else
+        
+                Bot3Bal = Bot3Bal - CallBal 'call
+                lblB3B.Caption = "Balance: $" & Bot3Bal
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB3M.Caption = "Bot 3 has called."
+                lblB3M.Visible = True
+                Bot3Turn = False
+    
+            End If
+    
+        ElseIf Bot3Bal <= CallBal Then
+    
+            CallBal = Bot3Bal
+            Bot3Bal = Bot3Bal - CallBal 'call
+            lblB3B.Caption = "Balance: $" & Bot3Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB3M.Caption = "Bot 3 is going all in."
+            lblB3M.Visible = True
+            Bot3Turn = False
+            Bot3AllIn = True
+    
+        End If
+
+    End If
+    
+End If
+
+If rndTurn = 3 Or rndTurn = 5 Or rndTurn = 6 Then 'call/check
+
+    If Bot3Bal > CallBal Then
+    
+        If Bot3BigBlind = True And CallBal = BigBlind Then 'check
+    
+            Bot3BigBlind = False
+            lblB3M.Caption = "Bot 3 has checked."
+            lblB3M.Visible = True
+            Bot3Turn = False
+            
+        ElseIf Bot3SmallBlind = True And CallBal = SmallBlind * 2 Then
+        
+            Bot3SmallBlind = False
+            tempSBal = CallBal - SmallBlind
+            Bot3Bal = Bot3Bal - tempSBal
+            lblB3B.Caption = "Balance: $" & Bot3Bal
+            lblB3M.Caption = "Bot 3 has called."
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB3M.Visible = True
+            Bot3Turn = False
+    
+        Else
+        
+            Bot3Bal = Bot3Bal - CallBal 'call
+            lblB3B.Caption = "Balance: $" & Bot3Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB3M.Caption = "Bot 3 has called."
+            lblB3M.Visible = True
+            Bot3Turn = False
+    
+        End If
+    
+    ElseIf Bot3Bal <= CallBal Then
+    
+        CallBal = Bot3Bal
+        Bot3Bal = Bot3Bal - CallBal 'call
+        lblB3B.Caption = "Balance: $" & Bot3Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB3M.Caption = "Bot 3 is going all in."
+        lblB3M.Visible = True
+        Bot3Turn = False
+        Bot3AllIn = True
+    
+    End If
+
+End If
+
+If rndTurn = 4 And Bot3Bal <= 3000 Then 'all in
+
+    CallBal = Bot3Bal
+    Bot3Bal = Bot3Bal - CallBal 'call
+    lblB3B.Caption = "Balance: $" & Bot3Bal
+    Pot = Pot + CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblB3M.Caption = "Bot 3 is going all in."
+    lblB3M.Visible = True
+    Bot3Turn = False
+    Bot3AllIn = True
+    
+ElseIf rndTurn = 4 And Bot3Bal > 3000 Then 'call
+    
+    If Bot3BigBlind = True And CallBal = BigBlind Then 'check
+    
+        Bot3BigBlind = False
+        lblB3M.Caption = "Bot 3 has checked."
+        lblB3M.Visible = True
+        Bot3Turn = False
+
+    ElseIf Bot3Bal <= CallBal Then
+    
+        CallBal = Bot3Bal
+        Bot3Bal = Bot3Bal - CallBal 'call
+        lblB3B.Caption = "Balance: $" & Bot3Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB3M.Caption = "Bot 3 is going all in."
+        lblB3M.Visible = True
+        Bot3Turn = False
+        Bot3AllIn = True
+    
+    Else
+        
+        Bot3Bal = Bot3Bal - CallBal 'call
+        lblB3B.Caption = "Balance: $" & Bot3Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB3M.Caption = "Bot 3 has called."
+        lblB3M.Visible = True
+        Bot3Turn = False
+    
+    End If
+
+End If
+
+PlayerTime = 2
+
+End If
+
+End Sub
+
+Public Sub Bot4TurnP()
+
+If Bot4Bal = 0 And Bot4AllIn = True Then
+
+    PlayerTime = 2
+    lblB4M.Visible = True
+    lblB4M.Caption = "No money left. Bot 4 went all in."
+
+Else
+
+Randomize
+rndTurn = Rnd * 5 + 1
+
+If rndTurn = 1 Then
+    
+    rndTurn = 3
+    'FoldCounter = FoldCounter + 1
+    'Bot4Fold = True
+    'imgB4B1.Top = 2880
+    'imgB4B1.Left = 2640
+    'imgB4B2.Top = 2880
+    'imgB4B2.Left = 2640
+    'imgBot4Card(1).Visible = False
+    'imgBot4Card(2).Visible = False
+    'lblB4M.Visible = True
+    'lblB4M.Caption = "Bot 4 has folded."
+    'Bot4Turn = False
+
+End If
+
+If rndTurn = 2 Then 'raise
+
+    If Bot4Bal > CallBal + 1000 Then
+
+        rndRaise = Rnd * 999 + 1
+        tempRaise = CallBal + rndRaise
+        
+        If tempRaise >= Bot4Bal Then 'all in/raise
+
+            tempRaise = Bot4Bal
+            CallBal = tempRaise
+            Bot4Bal = Bot4Bal - tempRaise
+            lblB4M.Caption = "Bot 4 is going all in."
+            lblB4B.Caption = "Balance: $" & Bot4Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB4M.Visible = True
+            Bot4Turn = False
+            Bot4AllIn = True
+        
+        Else
+                
+            If Bot4SmallBlind = True And CallBal = SmallBlind * 2 Then
+            
+                Bot4SmallBlind = False
+                tempSBal = tempRaise - SmallBlind
+                Bot4Bal = Bot4Bal - tempSBal
+                lblB4B.Caption = "Balance: $" & Bot4Bal
+                lblB4M.Caption = "Bot 4 has raised with $" & tempRaise & "."
+                lblPot.Caption = "Pot: $" & Pot
+                Pot = Pot + CallBal
+                lblB4M.Visible = True
+                Bot4Turn = False
+                CallBal = tempRaise
+            
+            ElseIf Bot4BigBlind = True And CallBal <> BigBlind Then
+            
+                Bot4BigBlind = False
+                tempBBal = tempRaise - BigBlind
+                Bot4Bal = Bot4Bal - tempBBal
+                lblB4B.Caption = "Balance: $" & Bot4Bal
+                lblB4M.Caption = "Bot 4 has raised with $" & tempRaise & "."
+                lblPot.Caption = "Pot: $" & Pot
+                Pot = Pot + CallBal
+                lblB4M.Visible = True
+                Bot4Turn = False
+                CallBal = tempRaise
+                
+            Else
+            
+                CallBal = tempRaise
+                Bot4Bal = Bot4Bal - tempRaise
+                lblB4B.Caption = "Balance: $" & Bot4Bal
+                lblB4M.Caption = "Bot 4 has raised with $" & tempRaise & "."
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB4M.Visible = True
+                Bot4Turn = False
+            
+            End If
+        
+        End If
+    
+    Else
+    
+        If Bot4Bal > CallBal Then
+        
+            If Bot4BigBlind = True And CallBal = BigBlind Then 'check
+    
+                Bot4BigBlind = False
+                lblB4M.Caption = "Bot 4 has checked."
+                lblB4M.Visible = True
+                Bot4Turn = False
+            
+            ElseIf Bot4SmallBlind = True And CallBal = SmallBlind * 2 Then
+                
+                Bot4SmallBlind = False
+                tempSBal = CallBal - SmallBlind
+                Bot4Bal = Bot4Bal - tempSBal
+                lblB4B.Caption = "Balance: $" & Bot4Bal
+                lblB4M.Caption = "Bot 4 has called."
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB4M.Visible = True
+                Bot4Turn = False
+            
+            Else
+        
+                Bot4Bal = Bot4Bal - CallBal 'call
+                lblB4B.Caption = "Balance: $" & Bot4Bal
+                Pot = Pot + CallBal
+                lblPot.Caption = "Pot: $" & Pot
+                lblB4M.Caption = "Bot 4 has called."
+                lblB4M.Visible = True
+                Bot4Turn = False
+    
+            End If
+    
+        ElseIf Bot4Bal <= CallBal Then
+    
+            CallBal = Bot4Bal
+            Bot4Bal = Bot4Bal - CallBal 'call
+            lblB4B.Caption = "Balance: $" & Bot4Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB4M.Caption = "Bot 4 is going all in."
+            lblB4M.Visible = True
+            Bot4Turn = False
+            Bot4AllIn = True
+    
+        End If
+
+    End If
+    
+End If
+
+If rndTurn = 3 Or rndTurn = 5 Or rndTurn = 6 Then 'call/check
+
+    If Bot4Bal > CallBal Then
+    
+        If Bot4BigBlind = True And CallBal = BigBlind Then 'check
+    
+            Bot4BigBlind = False
+            lblB4M.Caption = "Bot 4 has checked."
+            lblB4M.Visible = True
+            Bot4Turn = False
+            
+        ElseIf Bot4SmallBlind = True And CallBal = SmallBlind * 2 Then
+        
+            Bot4SmallBlind = False
+            tempSBal = CallBal - SmallBlind
+            Bot4Bal = Bot4Bal - tempSBal
+            lblB4B.Caption = "Balance: $" & Bot4Bal
+            lblB4M.Caption = "Bot 4 has called."
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB4M.Visible = True
+            Bot4Turn = False
+    
+        Else
+        
+            Bot4Bal = Bot4Bal - CallBal 'call
+            lblB4B.Caption = "Balance: $" & Bot4Bal
+            Pot = Pot + CallBal
+            lblPot.Caption = "Pot: $" & Pot
+            lblB4M.Caption = "Bot 4 has called."
+            lblB4M.Visible = True
+            Bot4Turn = False
+    
+        End If
+    
+    ElseIf Bot4Bal <= CallBal Then
+    
+        CallBal = Bot4Bal
+        Bot4Bal = Bot4Bal - CallBal 'call
+        lblB4B.Caption = "Balance: $" & Bot4Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB4M.Caption = "Bot 4 is going all in."
+        lblB4M.Visible = True
+        Bot4Turn = False
+        Bot4AllIn = True
+    
+    End If
+
+End If
+
+If rndTurn = 4 And Bot4Bal <= 3000 Then 'all in
+
+    CallBal = Bot4Bal
+    Bot4Bal = Bot4Bal - CallBal 'call
+    lblB4B.Caption = "Balance: $" & Bot4Bal
+    Pot = Pot + CallBal
+    lblPot.Caption = "Pot: $" & Pot
+    lblB4M.Caption = "Bot 4 is going all in."
+    lblB4M.Visible = True
+    Bot4Turn = False
+
+ElseIf rndTurn = 4 And Bot4Bal > 3000 Then 'call
+    
+    If Bot4BigBlind = True And CallBal = BigBlind Then 'check
+    
+        Bot4BigBlind = False
+        lblB4M.Caption = "Bot 4 has checked."
+        lblB4M.Visible = True
+        Bot4Turn = False
+        
+    ElseIf Bot4Bal <= CallBal Then
+    
+        CallBal = Bot4Bal
+        Bot4Bal = Bot4Bal - CallBal 'call
+        lblB4B.Caption = "Balance: $" & Bot4Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB4M.Caption = "Bot 4 is going all in."
+        lblB4M.Visible = True
+        Bot4Turn = False
+        Bot4AllIn = True
+    
+    Else
+        
+        Bot4Bal = Bot4Bal - CallBal 'call
+        lblB4B.Caption = "Balance: $" & Bot4Bal
+        Pot = Pot + CallBal
+        lblPot.Caption = "Pot: $" & Pot
+        lblB4M.Caption = "Bot 4 has called."
+        lblB4M.Visible = True
+        Bot4Turn = False
+    
+    End If
+
+End If
+
+PlayerTime = 2
+
+End If
+
+End Sub
+
+Private Sub tmrTurnDelay_Timer()
+
+Call CheckFoldP
+tmrTurnDelay.Enabled = False
+
+End Sub
+
+Public Sub RandomCardsP()
+
+Do
+
+rndCounter = rndCounter + 1
+Randomize
+rndCard = Rnd * 3 + 1
+
+If rndCounter = 1 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgPlayerCard(1).Picture = imgHearts(rndCards).Picture
+        imgPlayerCard(1).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgPlayerCard(1).Picture = imgDiamonds(rndCards).Picture
+        imgPlayerCard(1).Tag = Diamonds(rndCards)
+                
+    ElseIf rndCard = 3 Then
+    
+        imgPlayerCard(1).Picture = imgClubs(rndCards).Picture
+        imgPlayerCard(1).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgPlayerCard(1).Picture = imgSpades(rndCards).Picture
+        imgPlayerCard(1).Tag = Spades(rndCards)
+    
+    End If
+        
+End If
+
+If rndCounter = 2 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+        
+    If rndCard = 1 Then
+    
+        imgPlayerCard(2).Picture = imgHearts(rndCards).Picture
+        imgPlayerCard(2).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgPlayerCard(2).Picture = imgDiamonds(rndCards).Picture
+        imgPlayerCard(2).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+
+        imgPlayerCard(2).Picture = imgClubs(rndCards).Picture
+        imgPlayerCard(2).Tag = Clubs(rndCards)
+        
+    ElseIf rndCard = 4 Then
+    
+        imgPlayerCard(2).Picture = imgSpades(rndCards).Picture
+        imgPlayerCard(2).Tag = Spades(rndCards)
+    
+    End If
+    
+End If
+
+If rndCounter = 3 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgBot1Card(1).Picture = imgHearts(rndCards).Picture
+        imgBot1Card(1).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgBot1Card(1).Picture = imgDiamonds(rndCards).Picture
+        imgBot1Card(1).Tag = Diamonds(rndCards)
+        
+    ElseIf rndCard = 3 Then
+    
+        imgBot1Card(1).Picture = imgClubs(rndCards).Picture
+        imgBot1Card(1).Tag = Clubs(rndCards)
+        
+    ElseIf rndCard = 4 Then
+    
+        imgBot1Card(1).Picture = imgSpades(rndCards).Picture
+        imgBot1Card(1).Tag = Spades(rndCards)
+    
+    End If
+
+End If
+
+If rndCounter = 4 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgBot1Card(2).Picture = imgHearts(rndCards).Picture
+        imgBot1Card(2).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgBot1Card(2).Picture = imgDiamonds(rndCards).Picture
+        imgBot1Card(2).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgBot1Card(2).Picture = imgClubs(rndCards).Picture
+        imgBot1Card(2).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgBot1Card(2).Picture = imgSpades(rndCards).Picture
+        imgBot1Card(2).Tag = Spades(rndCards)
+    
+    End If
+
+End If
+
+If rndCounter = 5 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgBot2Card(1).Picture = imgHearts(rndCards).Picture
+        imgBot2Card(1).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgBot2Card(1).Picture = imgDiamonds(rndCards).Picture
+        imgBot2Card(1).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgBot2Card(1).Picture = imgClubs(rndCards).Picture
+        imgBot2Card(1).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgBot2Card(1).Picture = imgSpades(rndCards).Picture
+        imgBot2Card(1).Tag = Spades(rndCards)
+    
+    End If
+
+End If
+
+If rndCounter = 6 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgBot2Card(2).Picture = imgHearts(rndCards).Picture
+        imgBot2Card(2).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgBot2Card(2).Picture = imgDiamonds(rndCards).Picture
+        imgBot2Card(2).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgBot2Card(2).Picture = imgClubs(rndCards).Picture
+        imgBot2Card(2).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgBot2Card(2).Picture = imgSpades(rndCards).Picture
+        imgBot2Card(2).Tag = Spades(rndCards)
+    
+    End If
+
+End If
+
+If rndCounter = 7 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgBot3Card(1).Picture = imgHearts(rndCards).Picture
+        imgBot3Card(1).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgBot3Card(1).Picture = imgDiamonds(rndCards).Picture
+        imgBot3Card(1).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgBot3Card(1).Picture = imgClubs(rndCards).Picture
+        imgBot3Card(1).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgBot3Card(1).Picture = imgSpades(rndCards).Picture
+        imgBot3Card(1).Tag = Spades(rndCards)
+    
+    End If
+
+End If
+
+If rndCounter = 8 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgBot3Card(2).Picture = imgHearts(rndCards).Picture
+        imgBot3Card(2).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgBot3Card(2).Picture = imgDiamonds(rndCards).Picture
+        imgBot3Card(2).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgBot3Card(2).Picture = imgClubs(rndCards).Picture
+        imgBot3Card(2).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgBot3Card(2).Picture = imgSpades(rndCards).Picture
+        imgBot3Card(2).Tag = Spades(rndCards)
+    
+    End If
+
+End If
+
+If rndCounter = 9 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+    
+    If rndCard = 1 Then
+    
+        imgBot4Card(1).Picture = imgHearts(rndCards).Picture
+        imgBot4Card(1).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgBot4Card(1).Picture = imgDiamonds(rndCards).Picture
+        imgBot4Card(1).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgBot4Card(1).Picture = imgClubs(rndCards).Picture
+        imgBot4Card(1).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgBot4Card(1).Picture = imgSpades(rndCards).Picture
+        imgBot4Card(1).Tag = Spades(rndCards)
+    
+    End If
+
+End If
+
+If rndCounter = 10 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+        
+    If rndCard = 1 Then
+    
+        imgBot4Card(2).Picture = imgHearts(rndCards).Picture
+        imgBot4Card(2).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgBot4Card(2).Picture = imgDiamonds(rndCards).Picture
+        imgBot4Card(2).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgBot4Card(2).Picture = imgClubs(rndCards).Picture
+        imgBot4Card(2).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgBot4Card(2).Picture = imgSpades(rndCards).Picture
+        imgBot4Card(2).Tag = Spades(rndCards)
+    
+    End If
+        
+End If
+
+If rndCounter = 11 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgFlopCard(1).Picture = imgHearts(rndCards).Picture
+        imgFlopCard(1).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgFlopCard(1).Picture = imgDiamonds(rndCards).Picture
+        imgFlopCard(1).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgFlopCard(1).Picture = imgClubs(rndCards).Picture
+        imgFlopCard(1).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgFlopCard(1).Picture = imgSpades(rndCards).Picture
+        imgFlopCard(1).Tag = Spades(rndCards)
+    
+    End If
+
+End If
+
+If rndCounter = 12 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgFlopCard(2).Picture = imgHearts(rndCards).Picture
+        imgFlopCard(2).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgFlopCard(2).Picture = imgDiamonds(rndCards).Picture
+        imgFlopCard(2).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgFlopCard(2).Picture = imgClubs(rndCards).Picture
+        imgFlopCard(2).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgFlopCard(2).Picture = imgSpades(rndCards).Picture
+        imgFlopCard(2).Tag = Spades(rndCards)
+    
+    End If
+    
+End If
+
+If rndCounter = 13 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgFlopCard(3).Picture = imgHearts(rndCards).Picture
+        imgFlopCard(3).Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgFlopCard(3).Picture = imgDiamonds(rndCards).Picture
+        imgFlopCard(3).Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgFlopCard(3).Picture = imgClubs(rndCards).Picture
+        imgFlopCard(3).Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgFlopCard(3).Picture = imgSpades(rndCards).Picture
+        imgFlopCard(3).Tag = Spades(rndCards)
+    
+    End If
+    
+End If
+
+If rndCounter = 14 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgTurnCard.Picture = imgHearts(rndCards).Picture
+        imgTurnCard.Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgTurnCard.Picture = imgDiamonds(rndCards).Picture
+        imgTurnCard.Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgTurnCard.Picture = imgClubs(rndCards).Picture
+        imgTurnCard.Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgTurnCard.Picture = imgSpades(rndCards).Picture
+        imgTurnCard.Tag = Spades(rndCards)
+    
+    End If
+    
+End If
+
+If rndCounter = 15 Then
+
+    Randomize
+    rndCards = Rnd * 12 + 1
+
+    If rndCard = 1 Then
+    
+        imgRiverCard.Picture = imgHearts(rndCards).Picture
+        imgRiverCard.Tag = Hearts(rndCards)
+    
+    ElseIf rndCard = 2 Then
+    
+        imgRiverCard.Picture = imgDiamonds(rndCards).Picture
+        imgRiverCard.Tag = Diamonds(rndCards)
+    
+    ElseIf rndCard = 3 Then
+    
+        imgRiverCard.Picture = imgClubs(rndCards).Picture
+        imgRiverCard.Tag = Clubs(rndCards)
+    
+    ElseIf rndCard = 4 Then
+    
+        imgRiverCard.Picture = imgSpades(rndCards).Picture
+        imgRiverCard.Tag = Spades(rndCards)
+    
+    End If
+    
+End If
+
+Loop Until rndCounter = 15
+
+Call RandomizeCheckP
+
+End Sub
+
+Public Sub RandomizeCheckP()
+
+If imgPlayerCard(1).Tag = imgPlayerCard(2).Tag Or imgPlayerCard(1).Tag = imgBot1Card(1).Tag Or _
+            imgPlayerCard(1).Tag = imgBot1Card(2).Tag Or imgPlayerCard(1).Tag = imgBot2Card(1).Tag Or _
+            imgPlayerCard(1).Tag = imgBot2Card(2).Tag Or imgPlayerCard(1).Tag = imgBot3Card(1).Tag Or _
+            imgPlayerCard(1).Tag = imgBot3Card(2).Tag Or imgPlayerCard(1).Tag = imgBot4Card(1).Tag Or _
+            imgPlayerCard(1).Tag = imgBot4Card(2).Tag Or imgPlayerCard(1).Tag = imgFlopCard(1).Tag Or _
+            imgPlayerCard(1).Tag = imgFlopCard(2).Tag Or imgPlayerCard(1).Tag = imgFlopCard(3).Tag Or _
+            imgPlayerCard(1).Tag = imgTurnCard.Tag Or imgPlayerCard(1).Tag = imgRiverCard.Tag Then
+        
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+            
+        If rndCard = 1 Then
+    
+            imgPlayerCard(1).Picture = imgHearts(rndCards).Picture
+            imgPlayerCard(1).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgPlayerCard(1).Picture = imgDiamonds(rndCards).Picture
+            imgPlayerCard(1).Tag = Diamonds(rndCards)
+                
+        ElseIf rndCard = 3 Then
+    
+            imgPlayerCard(1).Picture = imgClubs(rndCards).Picture
+            imgPlayerCard(1).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgPlayerCard(1).Picture = imgSpades(rndCards).Picture
+            imgPlayerCard(1).Tag = Spades(rndCards)
+    
+        End If
+        
+    Loop Until imgPlayerCard(1).Tag <> imgPlayerCard(2).Tag And imgPlayerCard(1).Tag <> imgBot1Card(1).Tag And _
+        imgPlayerCard(1).Tag <> imgBot1Card(2).Tag And imgPlayerCard(1).Tag <> imgBot2Card(1).Tag And _
+        imgPlayerCard(1).Tag <> imgBot2Card(2).Tag And imgPlayerCard(1).Tag <> imgBot3Card(1).Tag And _
+        imgPlayerCard(1).Tag <> imgBot3Card(2).Tag And imgPlayerCard(1).Tag <> imgBot4Card(1).Tag And _
+        imgPlayerCard(1).Tag <> imgBot4Card(2).Tag And imgPlayerCard(1).Tag <> imgFlopCard(1).Tag And _
+        imgPlayerCard(1).Tag <> imgFlopCard(2).Tag And imgPlayerCard(1).Tag <> imgFlopCard(3).Tag And _
+        imgPlayerCard(1).Tag <> imgTurnCard.Tag And imgPlayerCard(1).Tag <> imgRiverCard.Tag
+    
+End If
+
+If imgPlayerCard(2).Tag = imgPlayerCard(1).Tag Or imgPlayerCard(2).Tag = imgBot1Card(1).Tag Or _
+            imgPlayerCard(2).Tag = imgBot1Card(2).Tag Or imgPlayerCard(2).Tag = imgBot2Card(1).Tag Or _
+            imgPlayerCard(2).Tag = imgBot2Card(2).Tag Or imgPlayerCard(2).Tag = imgBot3Card(1).Tag Or _
+            imgPlayerCard(2).Tag = imgBot3Card(2).Tag Or imgPlayerCard(2).Tag = imgBot4Card(1).Tag Or _
+            imgPlayerCard(2).Tag = imgBot4Card(2).Tag Or imgPlayerCard(2).Tag = imgFlopCard(1).Tag Or _
+            imgPlayerCard(2).Tag = imgFlopCard(2).Tag Or imgPlayerCard(2).Tag = imgFlopCard(3).Tag Or _
+            imgPlayerCard(2).Tag = imgTurnCard.Tag Or imgPlayerCard(2).Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+    
+        If rndCard = 1 Then
+    
+            imgPlayerCard(2).Picture = imgHearts(rndCards).Picture
+            imgPlayerCard(2).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgPlayerCard(2).Picture = imgDiamonds(rndCards).Picture
+            imgPlayerCard(2).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgPlayerCard(2).Picture = imgClubs(rndCards).Picture
+            imgPlayerCard(2).Tag = Clubs(rndCards)
+        
+        ElseIf rndCard = 4 Then
+    
+            imgPlayerCard(2).Picture = imgSpades(rndCards).Picture
+            imgPlayerCard(2).Tag = Spades(rndCards)
+    
+        End If
+    
+    Loop Until imgPlayerCard(2).Tag <> imgPlayerCard(1).Tag And imgPlayerCard(2).Tag <> imgBot1Card(1).Tag And _
+        imgPlayerCard(2).Tag <> imgBot1Card(2).Tag And imgPlayerCard(2).Tag <> imgBot2Card(1).Tag And _
+        imgPlayerCard(2).Tag <> imgBot2Card(2).Tag And imgPlayerCard(2).Tag <> imgBot3Card(1).Tag And _
+        imgPlayerCard(2).Tag <> imgBot3Card(2).Tag And imgPlayerCard(2).Tag <> imgBot4Card(1).Tag And _
+        imgPlayerCard(2).Tag <> imgBot4Card(2).Tag And imgPlayerCard(2).Tag <> imgFlopCard(1).Tag And _
+        imgPlayerCard(2).Tag <> imgFlopCard(2).Tag And imgPlayerCard(2).Tag <> imgFlopCard(3).Tag And _
+        imgPlayerCard(2).Tag <> imgTurnCard.Tag And imgPlayerCard(2).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgBot1Card(1).Tag = imgPlayerCard(1).Tag Or imgBot1Card(1).Tag = imgPlayerCard(2).Tag Or _
+            imgBot1Card(1).Tag = imgBot1Card(2).Tag Or imgBot1Card(1).Tag = imgBot2Card(1).Tag Or _
+            imgBot1Card(1).Tag = imgBot2Card(2).Tag Or imgBot1Card(1).Tag = imgBot3Card(1).Tag Or _
+            imgBot1Card(1).Tag = imgBot3Card(2).Tag Or imgBot1Card(1).Tag = imgBot4Card(1).Tag Or _
+            imgBot1Card(1).Tag = imgBot4Card(2).Tag Or imgBot1Card(1).Tag = imgFlopCard(1).Tag Or _
+            imgBot1Card(1).Tag = imgFlopCard(2).Tag Or imgBot1Card(1).Tag = imgFlopCard(3).Tag Or _
+            imgBot1Card(1).Tag = imgTurnCard.Tag Or imgBot1Card(1).Tag = imgRiverCard.Tag Then
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+            
+        If rndCard = 1 Then
+    
+            imgBot1Card(1).Picture = imgHearts(rndCards).Picture
+            imgBot1Card(1).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgBot1Card(1).Picture = imgDiamonds(rndCards).Picture
+            imgBot1Card(1).Tag = Diamonds(rndCards)
+        
+        ElseIf rndCard = 3 Then
+    
+            imgBot1Card(1).Picture = imgClubs(rndCards).Picture
+            imgBot1Card(1).Tag = Clubs(rndCards)
+        
+        ElseIf rndCard = 4 Then
+    
+            imgBot1Card(1).Picture = imgSpades(rndCards).Picture
+            imgBot1Card(1).Tag = Spades(rndCards)
+    
+        End If
+    
+    Loop Until imgBot1Card(1).Tag <> imgPlayerCard(1).Tag And imgBot1Card(1).Tag <> imgPlayerCard(2).Tag And _
+        imgBot1Card(1).Tag <> imgBot1Card(2).Tag And imgBot1Card(1).Tag <> imgBot2Card(1).Tag And _
+        imgBot1Card(1).Tag <> imgBot2Card(2).Tag And imgBot1Card(1).Tag <> imgBot3Card(1).Tag And _
+        imgBot1Card(1).Tag <> imgBot3Card(2).Tag And imgBot1Card(1).Tag <> imgBot4Card(1).Tag And _
+        imgBot1Card(1).Tag <> imgBot4Card(2).Tag And imgBot1Card(1).Tag <> imgFlopCard(1).Tag And _
+        imgBot1Card(1).Tag <> imgFlopCard(2).Tag And imgBot1Card(1).Tag <> imgFlopCard(3).Tag And _
+        imgBot1Card(1).Tag <> imgTurnCard.Tag And imgBot1Card(1).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgBot1Card(2).Tag = imgPlayerCard(1).Tag Or imgBot1Card(2).Tag = imgPlayerCard(2).Tag Or _
+            imgBot1Card(2).Tag = imgBot1Card(1).Tag Or imgBot1Card(2).Tag = imgBot2Card(1).Tag Or _
+            imgBot1Card(2).Tag = imgBot2Card(2).Tag Or imgBot1Card(2).Tag = imgBot3Card(1).Tag Or _
+            imgBot1Card(2).Tag = imgBot3Card(2).Tag Or imgBot1Card(2).Tag = imgBot4Card(1).Tag Or _
+            imgBot1Card(2).Tag = imgBot4Card(2).Tag Or imgBot1Card(2).Tag = imgFlopCard(1).Tag Or _
+            imgBot1Card(2).Tag = imgFlopCard(2).Tag Or imgBot1Card(2).Tag = imgFlopCard(3).Tag Or _
+            imgBot1Card(2).Tag = imgTurnCard.Tag Or imgBot1Card(2).Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+            
+        If rndCard = 1 Then
+    
+            imgBot1Card(2).Picture = imgHearts(rndCards).Picture
+            imgBot1Card(2).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgBot1Card(2).Picture = imgDiamonds(rndCards).Picture
+            imgBot1Card(2).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgBot1Card(2).Picture = imgClubs(rndCards).Picture
+            imgBot1Card(2).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgBot1Card(2).Picture = imgSpades(rndCards).Picture
+            imgBot1Card(2).Tag = Spades(rndCards)
+    
+        End If
+        
+    Loop Until imgBot1Card(2).Tag <> imgPlayerCard(1).Tag And imgBot1Card(2).Tag <> imgPlayerCard(2).Tag And _
+        imgBot1Card(2).Tag <> imgBot1Card(1).Tag And imgBot1Card(2).Tag <> imgBot2Card(1).Tag And _
+        imgBot1Card(2).Tag <> imgBot2Card(2).Tag And imgBot1Card(2).Tag <> imgBot3Card(1).Tag And _
+        imgBot1Card(2).Tag <> imgBot3Card(2).Tag And imgBot1Card(2).Tag <> imgBot4Card(1).Tag And _
+        imgBot1Card(2).Tag <> imgBot4Card(2).Tag And imgBot1Card(2).Tag <> imgFlopCard(1).Tag And _
+        imgBot1Card(2).Tag <> imgFlopCard(2).Tag And imgBot1Card(2).Tag <> imgFlopCard(3).Tag And _
+        imgBot1Card(2).Tag <> imgTurnCard.Tag And imgBot1Card(2).Tag <> imgRiverCard.Tag
+        
+End If
+
+If imgBot2Card(1).Tag = imgPlayerCard(1).Tag Or imgBot2Card(1).Tag = imgPlayerCard(2).Tag Or _
+            imgBot2Card(1).Tag = imgBot1Card(1).Tag Or imgBot2Card(1).Tag = imgBot1Card(2).Tag Or _
+            imgBot2Card(1).Tag = imgBot2Card(2).Tag Or imgBot2Card(1).Tag = imgBot3Card(1).Tag Or _
+            imgBot2Card(1).Tag = imgBot3Card(2).Tag Or imgBot2Card(1).Tag = imgBot4Card(1).Tag Or _
+            imgBot2Card(1).Tag = imgBot4Card(2).Tag Or imgBot2Card(1).Tag = imgFlopCard(1).Tag Or _
+            imgBot2Card(1).Tag = imgFlopCard(2).Tag Or imgBot2Card(1).Tag = imgFlopCard(3).Tag Or _
+            imgBot2Card(1).Tag = imgTurnCard.Tag Or imgBot2Card(1).Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+
+        If rndCard = 1 Then
+    
+            imgBot2Card(1).Picture = imgHearts(rndCards).Picture
+            imgBot2Card(1).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgBot2Card(1).Picture = imgDiamonds(rndCards).Picture
+            imgBot2Card(1).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgBot2Card(1).Picture = imgClubs(rndCards).Picture
+            imgBot2Card(1).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgBot2Card(1).Picture = imgSpades(rndCards).Picture
+            imgBot2Card(1).Tag = Spades(rndCards)
+            
+        End If
+    
+    Loop Until imgBot2Card(1).Tag <> imgPlayerCard(1).Tag And imgBot2Card(1).Tag <> imgPlayerCard(2).Tag And _
+        imgBot2Card(1).Tag <> imgBot1Card(1).Tag And imgBot2Card(1).Tag <> imgBot1Card(2).Tag And _
+        imgBot2Card(1).Tag <> imgBot2Card(2).Tag And imgBot2Card(1).Tag <> imgBot3Card(1).Tag And _
+        imgBot2Card(1).Tag <> imgBot3Card(2).Tag And imgBot2Card(1).Tag <> imgBot4Card(1).Tag And _
+        imgBot2Card(1).Tag <> imgBot4Card(2).Tag And imgBot2Card(1).Tag <> imgFlopCard(1).Tag And _
+        imgBot2Card(1).Tag <> imgFlopCard(2).Tag And imgBot2Card(1).Tag <> imgFlopCard(3).Tag And _
+        imgBot2Card(1).Tag <> imgTurnCard.Tag And imgBot2Card(1).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgBot2Card(2).Tag = imgPlayerCard(1).Tag Or imgBot2Card(2).Tag = imgPlayerCard(2).Tag Or _
+            imgBot2Card(2).Tag = imgBot1Card(1).Tag Or imgBot2Card(2).Tag = imgBot1Card(2).Tag Or _
+            imgBot2Card(2).Tag = imgBot2Card(1).Tag Or imgBot2Card(2).Tag = imgBot3Card(1).Tag Or _
+            imgBot2Card(2).Tag = imgBot3Card(2).Tag Or imgBot2Card(2).Tag = imgBot4Card(1).Tag Or _
+            imgBot2Card(2).Tag = imgBot4Card(2).Tag Or imgBot2Card(2).Tag = imgFlopCard(1).Tag Or _
+            imgBot2Card(2).Tag = imgFlopCard(2).Tag Or imgBot2Card(2).Tag = imgFlopCard(3).Tag Or _
+            imgBot2Card(2).Tag = imgTurnCard.Tag Or imgBot2Card(2).Tag = imgRiverCard.Tag Then
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+            
+        If rndCard = 1 Then
+    
+            imgBot2Card(2).Picture = imgHearts(rndCards).Picture
+            imgBot2Card(2).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgBot2Card(2).Picture = imgDiamonds(rndCards).Picture
+            imgBot2Card(2).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgBot2Card(2).Picture = imgClubs(rndCards).Picture
+            imgBot2Card(2).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgBot2Card(2).Picture = imgSpades(rndCards).Picture
+            imgBot2Card(2).Tag = Spades(rndCards)
+    
+        End If
+        
+    Loop Until imgBot2Card(2).Tag <> imgPlayerCard(1).Tag And imgBot2Card(2).Tag <> imgPlayerCard(2).Tag And _
+        imgBot2Card(2).Tag <> imgBot1Card(1).Tag And imgBot2Card(2).Tag <> imgBot1Card(2).Tag And _
+        imgBot2Card(2).Tag <> imgBot2Card(1).Tag And imgBot2Card(2).Tag <> imgBot3Card(1).Tag And _
+        imgBot2Card(2).Tag <> imgBot3Card(2).Tag And imgBot2Card(2).Tag <> imgBot4Card(1).Tag And _
+        imgBot2Card(2).Tag <> imgBot4Card(2).Tag And imgBot2Card(2).Tag <> imgFlopCard(1).Tag And _
+        imgBot2Card(2).Tag <> imgFlopCard(2).Tag And imgBot2Card(2).Tag <> imgFlopCard(3).Tag And _
+        imgBot2Card(2).Tag <> imgTurnCard.Tag And imgBot2Card(2).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgBot3Card(1).Tag = imgPlayerCard(1).Tag Or imgBot3Card(1).Tag = imgPlayerCard(2).Tag Or _
+            imgBot3Card(1).Tag = imgBot1Card(1).Tag Or imgBot3Card(1).Tag = imgBot1Card(2).Tag Or _
+            imgBot3Card(1).Tag = imgBot2Card(1).Tag Or imgBot3Card(1).Tag = imgBot2Card(2).Tag Or _
+            imgBot3Card(1).Tag = imgBot3Card(2).Tag Or imgBot3Card(1).Tag = imgBot4Card(1).Tag Or _
+            imgBot3Card(1).Tag = imgBot4Card(2).Tag Or imgBot3Card(1).Tag = imgFlopCard(1).Tag Or _
+            imgBot3Card(1).Tag = imgFlopCard(2).Tag Or imgBot3Card(1).Tag = imgFlopCard(3).Tag Or _
+            imgBot3Card(1).Tag = imgTurnCard.Tag Or imgBot3Card(1).Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+
+        If rndCard = 1 Then
+    
+            imgBot3Card(1).Picture = imgHearts(rndCards).Picture
+            imgBot3Card(1).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgBot3Card(1).Picture = imgDiamonds(rndCards).Picture
+            imgBot3Card(1).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgBot3Card(1).Picture = imgClubs(rndCards).Picture
+            imgBot3Card(1).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgBot3Card(1).Picture = imgSpades(rndCards).Picture
+            imgBot3Card(1).Tag = Spades(rndCards)
+    
+        End If
+            
+    Loop Until imgBot3Card(1).Tag <> imgPlayerCard(1).Tag And imgBot3Card(1).Tag <> imgPlayerCard(2).Tag And _
+        imgBot3Card(1).Tag <> imgBot1Card(1).Tag And imgBot3Card(1).Tag <> imgBot1Card(2).Tag And _
+        imgBot3Card(1).Tag <> imgBot2Card(1).Tag And imgBot3Card(1).Tag <> imgBot2Card(2).Tag And _
+        imgBot3Card(1).Tag <> imgBot3Card(2).Tag And imgBot3Card(1).Tag <> imgBot4Card(1).Tag And _
+        imgBot3Card(1).Tag <> imgBot4Card(2).Tag And imgBot3Card(1).Tag <> imgFlopCard(1).Tag And _
+        imgBot3Card(1).Tag <> imgFlopCard(2).Tag And imgBot3Card(1).Tag <> imgFlopCard(3).Tag And _
+        imgBot3Card(1).Tag <> imgTurnCard.Tag And imgBot3Card(1).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgBot3Card(2).Tag = imgPlayerCard(1).Tag Or imgBot3Card(2).Tag = imgPlayerCard(2).Tag Or _
+            imgBot3Card(2).Tag = imgBot1Card(1).Tag Or imgBot3Card(2).Tag = imgBot1Card(2).Tag Or _
+            imgBot3Card(2).Tag = imgBot2Card(1).Tag Or imgBot3Card(2).Tag = imgBot2Card(2).Tag Or _
+            imgBot3Card(2).Tag = imgBot3Card(1).Tag Or imgBot3Card(2).Tag = imgBot4Card(1).Tag Or _
+            imgBot3Card(2).Tag = imgBot4Card(2).Tag Or imgBot3Card(2).Tag = imgFlopCard(1).Tag Or _
+            imgBot3Card(2).Tag = imgFlopCard(2).Tag Or imgBot3Card(2).Tag = imgFlopCard(3).Tag Or _
+            imgBot3Card(2).Tag = imgTurnCard.Tag Or imgBot3Card(2).Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+    
+
+        If rndCard = 1 Then
+    
+            imgBot3Card(2).Picture = imgHearts(rndCards).Picture
+            imgBot3Card(2).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgBot3Card(2).Picture = imgDiamonds(rndCards).Picture
+            imgBot3Card(2).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgBot3Card(2).Picture = imgClubs(rndCards).Picture
+            imgBot3Card(2).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgBot3Card(2).Picture = imgSpades(rndCards).Picture
+            imgBot3Card(2).Tag = Spades(rndCards)
+    
+        End If
+    
+    Loop Until imgBot3Card(2).Tag <> imgPlayerCard(1).Tag And imgBot3Card(2).Tag <> imgPlayerCard(2).Tag And _
+        imgBot3Card(2).Tag <> imgBot1Card(1).Tag And imgBot3Card(2).Tag <> imgBot1Card(2).Tag And _
+        imgBot3Card(2).Tag <> imgBot2Card(1).Tag And imgBot3Card(2).Tag <> imgBot2Card(2).Tag And _
+        imgBot3Card(2).Tag <> imgBot3Card(1).Tag And imgBot3Card(2).Tag <> imgBot4Card(1).Tag And _
+        imgBot3Card(2).Tag <> imgBot4Card(2).Tag And imgBot3Card(2).Tag <> imgFlopCard(1).Tag And _
+        imgBot3Card(2).Tag <> imgFlopCard(2).Tag And imgBot3Card(2).Tag <> imgFlopCard(3).Tag And _
+        imgBot3Card(2).Tag <> imgTurnCard.Tag And imgBot3Card(2).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgBot4Card(1).Tag = imgPlayerCard(1).Tag Or imgBot4Card(1).Tag = imgPlayerCard(2).Tag Or _
+        imgBot4Card(1).Tag = imgBot1Card(1).Tag Or imgBot4Card(1).Tag = imgBot1Card(2).Tag Or _
+        imgBot4Card(1).Tag = imgBot2Card(1).Tag Or imgBot4Card(1).Tag = imgBot2Card(2).Tag Or _
+        imgBot4Card(1).Tag = imgBot3Card(1).Tag Or imgBot4Card(1).Tag = imgBot3Card(2).Tag Or _
+        imgBot4Card(1).Tag = imgBot4Card(2).Tag Or imgBot4Card(1).Tag = imgFlopCard(1).Tag Or _
+        imgBot4Card(1).Tag = imgFlopCard(2).Tag Or imgBot4Card(1).Tag = imgFlopCard(3).Tag Or _
+        imgBot4Card(1).Tag = imgTurnCard.Tag Or imgBot4Card(1).Tag = imgRiverCard.Tag Then
+        
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+    
+        If rndCard = 1 Then
+    
+            imgBot4Card(1).Picture = imgHearts(rndCards).Picture
+            imgBot4Card(1).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgBot4Card(1).Picture = imgDiamonds(rndCards).Picture
+            imgBot4Card(1).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgBot4Card(1).Picture = imgClubs(rndCards).Picture
+            imgBot4Card(1).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgBot4Card(1).Picture = imgSpades(rndCards).Picture
+            imgBot4Card(1).Tag = Spades(rndCards)
+    
+        End If
+        
+    Loop Until imgBot4Card(1).Tag <> imgPlayerCard(1).Tag And imgBot4Card(1).Tag <> imgPlayerCard(2).Tag And _
+        imgBot4Card(1).Tag <> imgBot1Card(1).Tag And imgBot4Card(1).Tag <> imgBot1Card(2).Tag And _
+        imgBot4Card(1).Tag <> imgBot2Card(1).Tag And imgBot4Card(1).Tag <> imgBot2Card(2).Tag And _
+        imgBot4Card(1).Tag <> imgBot3Card(1).Tag And imgBot4Card(1).Tag <> imgBot3Card(2).Tag And _
+        imgBot4Card(1).Tag <> imgBot4Card(2).Tag And imgBot4Card(1).Tag <> imgFlopCard(1).Tag And _
+        imgBot4Card(1).Tag <> imgFlopCard(2).Tag And imgBot4Card(1).Tag <> imgFlopCard(3).Tag And _
+        imgBot4Card(1).Tag <> imgTurnCard.Tag And imgBot4Card(1).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgBot4Card(2).Tag = imgPlayerCard(1).Tag Or imgBot4Card(2).Tag = imgPlayerCard(2).Tag Or _
+        imgBot4Card(2).Tag = imgBot1Card(1).Tag Or imgBot4Card(2).Tag = imgBot1Card(2).Tag Or _
+        imgBot4Card(2).Tag = imgBot2Card(1).Tag Or imgBot4Card(2).Tag = imgBot2Card(2).Tag Or _
+        imgBot4Card(2).Tag = imgBot3Card(1).Tag Or imgBot4Card(2).Tag = imgBot3Card(2).Tag Or _
+        imgBot4Card(2).Tag = imgBot4Card(1).Tag Or imgBot4Card(2).Tag = imgFlopCard(1).Tag Or _
+        imgBot4Card(2).Tag = imgFlopCard(2).Tag Or imgBot4Card(2).Tag = imgFlopCard(3).Tag Or _
+        imgBot4Card(2).Tag = imgTurnCard.Tag Or imgBot4Card(2).Tag = imgRiverCard.Tag Then
+        
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+        
+        If rndCard = 1 Then
+    
+            imgBot4Card(2).Picture = imgHearts(rndCards).Picture
+            imgBot4Card(2).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgBot4Card(2).Picture = imgDiamonds(rndCards).Picture
+            imgBot4Card(2).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgBot4Card(2).Picture = imgClubs(rndCards).Picture
+            imgBot4Card(2).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgBot4Card(2).Picture = imgSpades(rndCards).Picture
+            imgBot4Card(2).Tag = Spades(rndCards)
+    
+        End If
+    
+    Loop Until imgBot4Card(2).Tag <> imgPlayerCard(1).Tag And imgBot4Card(2).Tag <> imgPlayerCard(2).Tag And _
+        imgBot4Card(2).Tag <> imgBot1Card(1).Tag And imgBot4Card(2).Tag <> imgBot1Card(2).Tag And _
+        imgBot4Card(2).Tag <> imgBot2Card(1).Tag And imgBot4Card(2).Tag <> imgBot2Card(2).Tag And _
+        imgBot4Card(2).Tag <> imgBot3Card(1).Tag And imgBot4Card(2).Tag <> imgBot3Card(2).Tag And _
+        imgBot4Card(2).Tag <> imgBot4Card(1).Tag And imgBot4Card(2).Tag <> imgFlopCard(1).Tag And _
+        imgBot4Card(2).Tag <> imgFlopCard(2).Tag And imgBot4Card(2).Tag <> imgFlopCard(3).Tag And _
+        imgBot4Card(2).Tag <> imgTurnCard.Tag And imgBot4Card(2).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgFlopCard(1).Tag = imgPlayerCard(1).Tag Or imgFlopCard(1).Tag = imgPlayerCard(2).Tag Or _
+        imgFlopCard(1).Tag = imgBot1Card(1).Tag Or imgFlopCard(1).Tag = imgBot1Card(2).Tag Or _
+        imgFlopCard(1).Tag = imgBot2Card(1).Tag Or imgFlopCard(1).Tag = imgBot2Card(2).Tag Or _
+        imgFlopCard(1).Tag = imgBot3Card(1).Tag Or imgFlopCard(1).Tag = imgBot3Card(2).Tag Or _
+        imgFlopCard(1).Tag = imgBot4Card(1).Tag Or imgFlopCard(1).Tag = imgBot4Card(2).Tag Or _
+        imgFlopCard(1).Tag = imgFlopCard(2).Tag Or imgFlopCard(1).Tag = imgFlopCard(3).Tag Or _
+        imgFlopCard(1).Tag = imgTurnCard.Tag Or imgFlopCard(1).Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+
+        If rndCard = 1 Then
+    
+            imgFlopCard(1).Picture = imgHearts(rndCards).Picture
+            imgFlopCard(1).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgFlopCard(1).Picture = imgDiamonds(rndCards).Picture
+            imgFlopCard(1).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgFlopCard(1).Picture = imgClubs(rndCards).Picture
+            imgFlopCard(1).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgFlopCard(1).Picture = imgSpades(rndCards).Picture
+            imgFlopCard(1).Tag = Spades(rndCards)
+    
+        End If
+        
+    Loop Until imgFlopCard(1).Tag <> imgPlayerCard(1).Tag And imgFlopCard(1).Tag <> imgPlayerCard(2).Tag And _
+        imgFlopCard(1).Tag <> imgBot1Card(1).Tag And imgFlopCard(1).Tag <> imgBot1Card(2).Tag And _
+        imgFlopCard(1).Tag <> imgBot2Card(1).Tag And imgFlopCard(1).Tag <> imgBot2Card(2).Tag And _
+        imgFlopCard(1).Tag <> imgBot3Card(1).Tag And imgFlopCard(1).Tag <> imgBot3Card(2).Tag And _
+        imgFlopCard(1).Tag <> imgBot4Card(1).Tag And imgFlopCard(1).Tag <> imgBot4Card(2).Tag And _
+        imgFlopCard(1).Tag <> imgFlopCard(2).Tag And imgFlopCard(1).Tag <> imgFlopCard(3).Tag And _
+        imgFlopCard(1).Tag <> imgTurnCard.Tag And imgFlopCard(1).Tag <> imgRiverCard.Tag
+    
+End If
+
+If imgFlopCard(2).Tag = imgPlayerCard(1).Tag Or imgFlopCard(2).Tag = imgPlayerCard(2).Tag Or _
+        imgFlopCard(2).Tag = imgBot1Card(1).Tag Or imgFlopCard(2).Tag = imgBot1Card(2).Tag Or _
+        imgFlopCard(2).Tag = imgBot2Card(1).Tag Or imgFlopCard(2).Tag = imgBot2Card(2).Tag Or _
+        imgFlopCard(2).Tag = imgBot3Card(1).Tag Or imgFlopCard(2).Tag = imgBot3Card(2).Tag Or _
+        imgFlopCard(2).Tag = imgBot4Card(1).Tag Or imgFlopCard(2).Tag = imgBot4Card(2).Tag Or _
+        imgFlopCard(2).Tag = imgFlopCard(1).Tag Or imgFlopCard(2).Tag = imgFlopCard(3).Tag Or _
+        imgFlopCard(2).Tag = imgTurnCard.Tag Or imgFlopCard(2).Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+        
+        If rndCard = 1 Then
+    
+            imgFlopCard(2).Picture = imgHearts(rndCards).Picture
+            imgFlopCard(2).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgFlopCard(2).Picture = imgDiamonds(rndCards).Picture
+            imgFlopCard(2).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgFlopCard(2).Picture = imgClubs(rndCards).Picture
+            imgFlopCard(2).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgFlopCard(2).Picture = imgSpades(rndCards).Picture
+            imgFlopCard(2).Tag = Spades(rndCards)
+    
+        End If
+    
+    Loop Until imgFlopCard(2).Tag <> imgPlayerCard(1).Tag And imgFlopCard(2).Tag <> imgPlayerCard(2).Tag And _
+        imgFlopCard(2).Tag <> imgBot1Card(1).Tag And imgFlopCard(2).Tag <> imgBot1Card(2).Tag And _
+        imgFlopCard(2).Tag <> imgBot2Card(1).Tag And imgFlopCard(2).Tag <> imgBot2Card(2).Tag And _
+        imgFlopCard(2).Tag <> imgBot3Card(1).Tag And imgFlopCard(2).Tag <> imgBot3Card(2).Tag And _
+        imgFlopCard(2).Tag <> imgBot4Card(1).Tag And imgFlopCard(2).Tag <> imgBot4Card(2).Tag And _
+        imgFlopCard(2).Tag <> imgFlopCard(1).Tag And imgFlopCard(2).Tag <> imgFlopCard(3).Tag And _
+        imgFlopCard(2).Tag <> imgTurnCard.Tag And imgFlopCard(2).Tag <> imgRiverCard.Tag
+
+End If
+
+If imgFlopCard(3).Tag = imgPlayerCard(1).Tag Or imgFlopCard(3).Tag = imgPlayerCard(2).Tag Or _
+        imgFlopCard(3).Tag = imgBot1Card(1).Tag Or imgFlopCard(3).Tag = imgBot1Card(2).Tag Or _
+        imgFlopCard(3).Tag = imgBot2Card(1).Tag Or imgFlopCard(3).Tag = imgBot2Card(2).Tag Or _
+        imgFlopCard(3).Tag = imgBot3Card(1).Tag Or imgFlopCard(3).Tag = imgBot3Card(2).Tag Or _
+        imgFlopCard(3).Tag = imgBot4Card(1).Tag Or imgFlopCard(3).Tag = imgBot4Card(2).Tag Or _
+        imgFlopCard(3).Tag = imgFlopCard(1).Tag Or imgFlopCard(3).Tag = imgFlopCard(2).Tag Or _
+        imgFlopCard(3).Tag = imgTurnCard.Tag Or imgFlopCard(3).Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+        
+        If rndCard = 1 Then
+    
+            imgFlopCard(3).Picture = imgHearts(rndCards).Picture
+            imgFlopCard(3).Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgFlopCard(3).Picture = imgDiamonds(rndCards).Picture
+            imgFlopCard(3).Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgFlopCard(3).Picture = imgClubs(rndCards).Picture
+            imgFlopCard(3).Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgFlopCard(3).Picture = imgSpades(rndCards).Picture
+            imgFlopCard(3).Tag = Spades(rndCards)
+    
+        End If
+    
+    Loop Until imgFlopCard(3).Tag <> imgPlayerCard(1).Tag And imgFlopCard(3).Tag <> imgPlayerCard(2).Tag And _
+        imgFlopCard(3).Tag <> imgBot1Card(1).Tag And imgFlopCard(3).Tag <> imgBot1Card(2).Tag And _
+        imgFlopCard(3).Tag <> imgBot2Card(1).Tag And imgFlopCard(3).Tag <> imgBot2Card(2).Tag And _
+        imgFlopCard(3).Tag <> imgBot3Card(1).Tag And imgFlopCard(3).Tag <> imgBot3Card(2).Tag And _
+        imgFlopCard(3).Tag <> imgBot4Card(1).Tag And imgFlopCard(3).Tag <> imgBot4Card(2).Tag And _
+        imgFlopCard(3).Tag <> imgFlopCard(1).Tag And imgFlopCard(3).Tag <> imgFlopCard(2).Tag And _
+        imgFlopCard(3).Tag <> imgTurnCard.Tag And imgFlopCard(3).Tag <> imgRiverCard.Tag
+    
+End If
+
+If imgTurnCard.Tag = imgPlayerCard(1).Tag Or imgTurnCard.Tag = imgPlayerCard(2).Tag Or _
+        imgTurnCard.Tag = imgBot1Card(1).Tag Or imgTurnCard.Tag = imgBot1Card(2).Tag Or _
+        imgTurnCard.Tag = imgBot2Card(1).Tag Or imgTurnCard.Tag = imgBot2Card(2).Tag Or _
+        imgTurnCard.Tag = imgBot3Card(1).Tag Or imgTurnCard.Tag = imgBot3Card(2).Tag Or _
+        imgTurnCard.Tag = imgBot4Card(1).Tag Or imgTurnCard.Tag = imgBot4Card(2).Tag Or _
+        imgTurnCard.Tag = imgFlopCard(1).Tag Or imgTurnCard.Tag = imgFlopCard(2).Tag Or _
+        imgTurnCard.Tag = imgFlopCard(3).Tag Or imgTurnCard.Tag = imgRiverCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+        
+        If rndCard = 1 Then
+    
+            imgTurnCard.Picture = imgHearts(rndCards).Picture
+            imgTurnCard.Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgTurnCard.Picture = imgDiamonds(rndCards).Picture
+            imgTurnCard.Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgTurnCard.Picture = imgClubs(rndCards).Picture
+            imgTurnCard.Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgTurnCard.Picture = imgSpades(rndCards).Picture
+            imgTurnCard.Tag = Spades(rndCards)
+    
+        End If
+           
+    Loop Until imgTurnCard.Tag <> imgPlayerCard(1).Tag And imgTurnCard.Tag <> imgPlayerCard(2).Tag And _
+        imgTurnCard.Tag <> imgBot1Card(1).Tag And imgTurnCard.Tag <> imgBot1Card(2).Tag And _
+        imgTurnCard.Tag <> imgBot2Card(1).Tag And imgTurnCard.Tag <> imgBot2Card(2).Tag And _
+        imgTurnCard.Tag <> imgBot3Card(1).Tag And imgTurnCard.Tag <> imgBot3Card(2).Tag And _
+        imgTurnCard.Tag <> imgBot4Card(1).Tag And imgTurnCard.Tag <> imgBot4Card(2).Tag And _
+        imgTurnCard.Tag <> imgFlopCard(1).Tag And imgTurnCard.Tag <> imgFlopCard(2).Tag And _
+        imgTurnCard.Tag <> imgFlopCard(3).Tag And imgTurnCard.Tag <> imgRiverCard.Tag
+
+End If
+
+If imgTurnCard.Tag = imgPlayerCard(1).Tag Or imgRiverCard.Tag = imgPlayerCard(2).Tag Or _
+        imgRiverCard.Tag = imgBot1Card(1).Tag Or imgRiverCard.Tag = imgBot1Card(2).Tag Or _
+        imgRiverCard.Tag = imgBot2Card(1).Tag Or imgRiverCard.Tag = imgBot2Card(2).Tag Or _
+        imgRiverCard.Tag = imgBot3Card(1).Tag Or imgRiverCard.Tag = imgBot3Card(2).Tag Or _
+        imgRiverCard.Tag = imgBot4Card(1).Tag Or imgRiverCard.Tag = imgBot4Card(2).Tag Or _
+        imgRiverCard.Tag = imgFlopCard(1).Tag Or imgRiverCard.Tag = imgFlopCard(2).Tag Or _
+        imgRiverCard.Tag = imgFlopCard(3).Tag Or imgRiverCard.Tag = imgTurnCard.Tag Then
+
+    Do
+    
+    Randomize
+    rndCards = Rnd * 12 + 1
+    rndCard = Rnd * 3 + 1
+        
+        If rndCard = 1 Then
+    
+            imgRiverCard.Picture = imgHearts(rndCards).Picture
+            imgRiverCard.Tag = Hearts(rndCards)
+    
+        ElseIf rndCard = 2 Then
+    
+            imgRiverCard.Picture = imgDiamonds(rndCards).Picture
+            imgRiverCard.Tag = Diamonds(rndCards)
+    
+        ElseIf rndCard = 3 Then
+    
+            imgRiverCard.Picture = imgClubs(rndCards).Picture
+            imgRiverCard.Tag = Clubs(rndCards)
+    
+        ElseIf rndCard = 4 Then
+    
+            imgRiverCard.Picture = imgSpades(rndCards).Picture
+            imgRiverCard.Tag = Spades(rndCards)
+    
+        End If
+    
+    Loop Until imgTurnCard.Tag <> imgPlayerCard(1).Tag And imgRiverCard.Tag <> imgPlayerCard(2).Tag And _
+        imgRiverCard.Tag <> imgBot1Card(1).Tag And imgRiverCard.Tag <> imgBot1Card(2).Tag And _
+        imgRiverCard.Tag <> imgBot2Card(1).Tag And imgRiverCard.Tag <> imgBot2Card(2).Tag And _
+        imgRiverCard.Tag <> imgBot3Card(1).Tag And imgRiverCard.Tag <> imgBot3Card(2).Tag And _
+        imgRiverCard.Tag <> imgBot4Card(1).Tag And imgRiverCard.Tag <> imgBot4Card(2).Tag And _
+        imgRiverCard.Tag <> imgFlopCard(1).Tag And imgRiverCard.Tag <> imgFlopCard(2).Tag And _
+        imgRiverCard.Tag <> imgFlopCard(3).Tag And imgRiverCard.Tag <> imgTurnCard.Tag
+
+End If
+
+End Sub
+
+Public Sub PokerHandsP()
+
+PlayerCardNum1 = CInt(Right(imgPlayerCard(1).Tag, 2))
+PlayerCardNum2 = CInt(Right(imgPlayerCard(2).Tag, 2))
+Bot1CardNum1 = CInt(Right(imgBot1Card(1).Tag, 2))
+Bot1CardNum2 = CInt(Right(imgBot1Card(2).Tag, 2))
+Bot2CardNum1 = CInt(Right(imgBot2Card(1).Tag, 2))
+Bot2CardNum2 = CInt(Right(imgBot2Card(2).Tag, 2))
+Bot3CardNum1 = CInt(Right(imgBot3Card(1).Tag, 2))
+Bot3CardNum2 = CInt(Right(imgBot3Card(2).Tag, 2))
+Bot4CardNum1 = CInt(Right(imgBot4Card(1).Tag, 2))
+Bot4CardNum2 = CInt(Right(imgBot4Card(2).Tag, 2))
+FlopCardNum1 = CInt(Right(imgFlopCard(1).Tag, 2))
+FlopCardNum2 = CInt(Right(imgFlopCard(2).Tag, 2))
+FlopCardNum3 = CInt(Right(imgFlopCard(3).Tag, 2))
+TurnCardNum = CInt(Right(imgTurnCard.Tag, 2))
+RiverCardNum = CInt(Right(imgRiverCard.Tag, 2))
+'imgFlopCard (1)
+'imgFlopCard (2)
+'imgFlopCard (3)
+'imgTurnCard
+'imgRiverCard
+'imgPlayerCard (1)
+'imgPlayerCard (2)
+
+Call HighCardP
+Call OneTwoThreeFourFullPairP
+'Call RoyalFlushP
+
+
+End Sub
+
+Public Sub CheckWinsP()
+
+lblGameWinM.Visible = True
+imgB1B1.Visible = False
+imgB1B2.Visible = False
+imgB2B1.Visible = False
+imgB2B2.Visible = False
+imgB3B1.Visible = False
+imgB3B2.Visible = False
+imgB4B1.Visible = False
+imgB4B2.Visible = False
+
+If PlayerFold = True Then
+    
+    PlayerCards = 0
+
+End If
+
+If Bot1Fold = True Then
+    
+    Bot1Cards = 0
+
+End If
+
+If Bot2Fold = True Then
+    
+    Bot2Cards = 0
+
+End If
+
+If Bot3Fold = True Then
+    
+    Bot3Cards = 0
+
+End If
+
+If Bot4Fold = True Then
+    
+    Bot4Cards = 0
+
+End If
+
+
+If PlayerCards > Bot1Cards And PlayerCards > Bot2Cards And PlayerCards > Bot3Cards And PlayerCards > Bot4Cards Then
+    
+    PlayerBal = PlayerBal + Pot
+    lblPlayerBal.Caption = "Balance: $" & PlayerBal
+    Pot = 0
+    lblPot.Caption = "Pot: $" & Pot
+    
+    If PlayerCards = 1 Then
+    
+        lblGameWinM.Caption = "You have won with a high card!"
+
+    ElseIf PlayerCards = 2 Then
+    
+        lblGameWinM.Caption = "You have won with a one pair!"
+
+    ElseIf PlayerCards = 3 Then
+    
+        lblGameWinM.Caption = "You have won with a two pairs!"
+
+    ElseIf PlayerCards = 4 Then
+    
+        lblGameWinM.Caption = "You have won with three of a kind!"
+
+    ElseIf PlayerCards = 7 Then
+    
+        lblGameWinM.Caption = "You have won with a full house!"
+
+    ElseIf PlayerCards = 8 Then
+    
+        lblGameWinM.Caption = "You have won with four of a kind!"
+    
+    End If
+
+End If
+
+If Bot1Cards > PlayerCards And Bot1Cards > Bot2Cards And Bot1Cards > Bot3Cards And Bot1Cards > Bot4Cards Then
+    
+    Bot1Bal = Bot1Bal + Pot
+    lblB1B.Caption = "Balance: $" & Bot1Bal
+    Pot = 0
+    lblPot.Caption = "Pot: $" & Pot
+    
+    If Bot1Cards = 1 Then
+    
+        lblGameWinM.Caption = "Bot 1 has won with a high card!"
+
+    ElseIf Bot1Cards = 2 Then
+    
+        lblGameWinM.Caption = "Bot 1 has won with a one pair!"
+
+    ElseIf Bot1Cards = 3 Then
+    
+        lblGameWinM.Caption = "Bot 1 has won with a two pairs!"
+
+    ElseIf Bot1Cards = 4 Then
+    
+        lblGameWinM.Caption = "Bot 1 has won with three of a kind!"
+
+    ElseIf Bot1Cards = 7 Then
+    
+        lblGameWinM.Caption = "Bot 1 has won with a full house!"
+
+    ElseIf Bot1Cards = 8 Then
+    
+        lblGameWinM.Caption = "Bot 1 has won with four of a kind!"
+    
+    End If
+
+End If
+
+If Bot2Cards > PlayerCards And Bot2Cards > Bot1Cards And Bot2Cards > Bot3Cards And Bot2Cards > Bot4Cards Then
+    
+    Bot2Bal = Bot2Bal + Pot
+    lblB2B.Caption = "Balance: $" & Bot2Bal
+    Pot = 0
+    lblPot.Caption = "Pot: $" & Pot
+    
+    If Bot2Cards = 1 Then
+    
+        lblGameWinM.Caption = "Bot 2 has won with a high card!"
+
+    ElseIf Bot2Cards = 2 Then
+    
+        lblGameWinM.Caption = "Bot 2 has won with a one pair!"
+
+    ElseIf Bot2Cards = 3 Then
+    
+        lblGameWinM.Caption = "Bot 2 has won with a two pairs!"
+
+    ElseIf Bot2Cards = 4 Then
+    
+        lblGameWinM.Caption = "Bot 2 has won with three of a kind!"
+
+    ElseIf Bot2Cards = 7 Then
+    
+        lblGameWinM.Caption = "Bot 2 has won with a full house!"
+
+    ElseIf Bot2Cards = 8 Then
+    
+        lblGameWinM.Caption = "Bot 2 has won with four of a kind!"
+    
+    End If
+
+End If
+
+If Bot3Cards > PlayerCards And Bot3Cards > Bot1Cards And Bot3Cards > Bot2Cards And Bot3Cards > Bot4Cards Then
+    
+    Bot3Bal = Bot3Bal + Pot
+    lblB3B.Caption = "Balance: $" & Bot3Bal
+    Pot = 0
+    lblPot.Caption = "Pot: $" & Pot
+    
+    If Bot3Cards = 1 Then
+    
+        lblGameWinM.Caption = "Bot 3 has won with a high card!"
+
+    ElseIf Bot3Cards = 2 Then
+    
+        lblGameWinM.Caption = "Bot 3 has won with a one pair!"
+
+    ElseIf Bot3Cards = 3 Then
+    
+        lblGameWinM.Caption = "Bot 3 has won with a two pairs!"
+
+    ElseIf Bot3Cards = 4 Then
+    
+        lblGameWinM.Caption = "Bot 3 has won with three of a kind!"
+
+    ElseIf Bot3Cards = 7 Then
+    
+        lblGameWinM.Caption = "Bot 3 has won with a full house!"
+
+    ElseIf Bot3Cards = 8 Then
+    
+        lblGameWinM.Caption = "Bot 3 has won with four of a kind!"
+    
+    End If
+
+End If
+
+If Bot4Cards > PlayerCards And Bot4Cards > Bot1Cards And Bot4Cards > Bot2Cards And Bot4Cards > Bot3Cards Then
+    
+    Bot4Bal = Bot4Bal + Pot
+    lblB4B.Caption = "Balance: $" & Bot4Bal
+    Pot = 0
+    lblPot.Caption = "Pot: $" & Pot
+    
+    If Bot4Cards = 1 Then
+    
+        lblGameWinM.Caption = "Bot 4 has won with a high card!"
+
+    ElseIf Bot4Cards = 2 Then
+    
+        lblGameWinM.Caption = "Bot 4 has won with a one pair!"
+
+    ElseIf Bot4Cards = 3 Then
+    
+        lblGameWinM.Caption = "Bot 4 has won with a two pairs!"
+
+    ElseIf Bot4Cards = 4 Then
+    
+        lblGameWinM.Caption = "Bot 4 has won with three of a kind!"
+
+    ElseIf Bot4Cards = 7 Then
+    
+        lblGameWinM.Caption = "Bot 4 has won with a full house!"
+
+    ElseIf Bot4Cards = 8 Then
+    
+        lblGameWinM.Caption = "Bot 4 has won with four of a kind!"
+    
+    End If
+
+End If
+
+tmrReset.Enabled = True
+
+End Sub
+
+Public Sub HighCardP()
+
+If (PlayerCardNum1 > Bot1CardNum1 And PlayerCardNum1 > Bot1CardNum2) And (PlayerCardNum1 > Bot2CardNum1 And PlayerCardNum1 > Bot2CardNum2) _
+    And (PlayerCardNum1 > Bot3CardNum1 And PlayerCardNum1 > Bot3CardNum2) And (PlayerCardNum1 > Bot4CardNum1 And PlayerCardNum1 > Bot4CardNum2) Or _
+    (PlayerCardNum2 > Bot1CardNum1 And PlayerCardNum2 > Bot1CardNum2) And (PlayerCardNum2 > Bot2CardNum1 And PlayerCardNum2 > Bot2CardNum2) _
+    And (PlayerCardNum2 > Bot3CardNum1 And PlayerCardNum2 > Bot3CardNum2) And (PlayerCardNum2 > Bot4CardNum1 And PlayerCardNum2 > Bot4CardNum2) Then
+
+    PlayerCards = 1
+
+End If
+
+If (Bot1CardNum1 > PlayerCardNum1 And Bot1CardNum1 > PlayerCardNum2) And (Bot1CardNum1 > Bot2CardNum1 And Bot1CardNum1 > Bot2CardNum2) _
+    And (Bot1CardNum1 > Bot3CardNum1 And Bot1CardNum1 > Bot3CardNum2) And (Bot1CardNum1 > Bot4CardNum1 And Bot1CardNum1 > Bot4CardNum2) Or _
+    (Bot1CardNum1 > PlayerCardNum1 And Bot1CardNum1 > PlayerCardNum2) And (Bot1CardNum1 > Bot2CardNum1 And Bot1CardNum1 > Bot2CardNum2) _
+    And (Bot1CardNum1 > Bot3CardNum1 And Bot1CardNum1 > Bot3CardNum2) And (Bot1CardNum1 > Bot4CardNum1 And Bot1CardNum1 > Bot4CardNum2) Then
+
+    Bot1Cards = 1
+
+End If
+
+If (Bot2CardNum1 > PlayerCardNum1 And Bot2CardNum1 > PlayerCardNum2) And (Bot2CardNum1 > Bot1CardNum1 And Bot2CardNum1 > Bot1CardNum2) _
+    And (Bot2CardNum1 > Bot3CardNum1 And Bot2CardNum1 > Bot3CardNum2) And (Bot2CardNum1 > Bot4CardNum1 And Bot2CardNum1 > Bot4CardNum2) Or _
+    (Bot2CardNum1 > PlayerCardNum1 And Bot2CardNum1 > PlayerCardNum2) And (Bot2CardNum1 > Bot1CardNum1 And Bot2CardNum1 > Bot1CardNum2) _
+    And (Bot2CardNum1 > Bot3CardNum1 And Bot2CardNum1 > Bot3CardNum2) And (Bot2CardNum1 > Bot4CardNum1 And Bot2CardNum1 > Bot4CardNum2) Then
+
+    Bot2Cards = 1
+
+End If
+
+If (Bot3CardNum1 > PlayerCardNum1 And Bot3CardNum1 > PlayerCardNum2) And (Bot3CardNum1 > Bot1CardNum1 And Bot3CardNum1 > Bot1CardNum2) _
+    And (Bot3CardNum1 > Bot2CardNum1 And Bot3CardNum1 > Bot2CardNum2) And (Bot3CardNum1 > Bot4CardNum1 And Bot3CardNum1 > Bot4CardNum2) Or _
+    (Bot3CardNum1 > PlayerCardNum1 And Bot3CardNum1 > PlayerCardNum2) And (Bot3CardNum1 > Bot1CardNum1 And Bot3CardNum1 > Bot1CardNum2) _
+    And (Bot3CardNum1 > Bot2CardNum1 And Bot3CardNum1 > Bot2CardNum2) And (Bot3CardNum1 > Bot4CardNum1 And Bot3CardNum1 > Bot4CardNum2) Then
+    
+    Bot3Cards = 1
+    
+End If
+
+If (Bot4CardNum1 > PlayerCardNum1 And Bot4CardNum1 > PlayerCardNum2) And (Bot4CardNum1 > Bot1CardNum1 And Bot4CardNum1 > Bot1CardNum2) _
+    And (Bot4CardNum1 > Bot2CardNum1 And Bot4CardNum1 > Bot2CardNum2) And (Bot4CardNum1 > Bot3CardNum1 And Bot4CardNum1 > Bot3CardNum2) Or _
+    (Bot4CardNum1 > PlayerCardNum1 And Bot4CardNum1 > PlayerCardNum2) And (Bot4CardNum1 > Bot1CardNum1 And Bot4CardNum1 > Bot1CardNum2) _
+    And (Bot4CardNum1 > Bot2CardNum1 And Bot4CardNum1 > Bot2CardNum2) And (Bot4CardNum1 > Bot3CardNum1 And Bot4CardNum1 > Bot3CardNum2) Then
+    
+    Bot4Cards = 1
+    
+End If
+
+End Sub
+Public Sub OneTwoThreeFourFullPairP()
+
+wordNum = PlayerCardNum1 & " " & PlayerCardNum2 & " " & FlopCardNum1 & " " & FlopCardNum2 & " " _
+            & FlopCardNum3 & " " & TurnCardNum & " " & RiverCardNum
+
+wordNum1 = Bot1CardNum1 & " " & Bot1CardNum2 & " " & FlopCardNum1 & " " & FlopCardNum2 & " " _
+            & FlopCardNum3 & " " & TurnCardNum & " " & RiverCardNum
+
+
+wordNum2 = Bot2CardNum1 & " " & Bot2CardNum2 & " " & FlopCardNum1 & " " & FlopCardNum2 & " " _
+            & FlopCardNum3 & " " & TurnCardNum & " " & RiverCardNum
+
+wordNum3 = Bot3CardNum1 & " " & Bot3CardNum2 & " " & FlopCardNum1 & " " & FlopCardNum2 & " " _
+            & FlopCardNum3 & " " & TurnCardNum & " " & RiverCardNum
+
+wordNum4 = Bot4CardNum1 & " " & Bot4CardNum2 & " " & FlopCardNum1 & " " & FlopCardNum2 & " " _
+            & FlopCardNum3 & " " & TurnCardNum & " " & RiverCardNum
+            
+Call NP
+Call NP1
+Call NP2
+Call NP3
+Call NP4
+            
+End Sub
+
+Public Sub NP()
+
+N = Split(wordNum, " 2")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "11")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, " 3")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, " 4")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "5")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "6")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "7")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "8")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "9")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "10")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "12")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "13")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+N = Split(wordNum, "14")
+
+If UBound(N) = 2 Then
+
+    PlayerCards = 2
+    PairCounter = PairCounter + 1
+
+ElseIf UBound(N) = 3 Then
+
+    PlayerCards = 4
+    ThreeCounter = ThreeCounter + 1
+
+ElseIf UBound(N) = 4 Then
+
+    PlayerCards = 8
+
+Else
+
+End If
+
+If PairCounter = 2 Then
+
+    PlayerCards = 3
+
+End If
+
+If PairCounter = 2 And ThreeCounter = 1 Then
+
+    PlayerCards = 7
+    
+End If
+
+If PlayerCards = 0 Then
+
+    PlayerCards = 1
+
+End If
+
+End Sub
+
+Public Sub NP1()
+
+N1 = Split(wordNum1, " 2")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "11")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, " 3")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, " 4")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "5")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "6")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "7")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "8")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "9")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "10")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "12")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "13")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+N1 = Split(wordNum1, "14")
+
+If UBound(N1) = 2 Then
+
+    Bot1Cards = 2
+    PairCounter1 = PairCounter1 + 1
+
+ElseIf UBound(N1) = 3 Then
+
+    Bot1Cards = 4
+    ThreeCounter1 = ThreeCounter1 + 1
+
+ElseIf UBound(N1) = 4 Then
+
+    Bot1Cards = 8
+
+Else
+
+End If
+
+If PairCounter1 = 2 Then
+
+    Bot1Cards = 3
+
+End If
+
+If PairCounter1 = 2 And ThreeCounter1 = 1 Then
+
+    Bot1Cards = 7
+    
+End If
+
+If Bot1Cards = 0 Then
+
+    Bot1Cards = 1
+
+End If
+
+End Sub
+
+Public Sub NP2()
+
+N2 = Split(wordNum2, " 2")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "11")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, " 3")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, " 4")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "5")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "6")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "7")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "8")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "9")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "10")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "12")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "13")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+N2 = Split(wordNum2, "14")
+
+If UBound(N2) = 2 Then
+
+    Bot2Cards = 2
+    PairCounter2 = PairCounter2 + 1
+
+ElseIf UBound(N2) = 3 Then
+
+    Bot2Cards = 4
+    ThreeCounter2 = ThreeCounter2 + 1
+
+ElseIf UBound(N2) = 4 Then
+
+    Bot2Cards = 8
+
+Else
+
+End If
+
+If PairCounter2 = 2 Then
+
+    Bot2Cards = 3
+
+End If
+
+If PairCounter2 = 2 And ThreeCounter2 = 1 Then
+
+    Bot2Cards = 7
+    
+End If
+
+If Bot2Cards = 0 Then
+
+    Bot2Cards = 1
+
+End If
+
+End Sub
+
+Public Sub NP3()
+
+N3 = Split(wordNum3, " 2")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "11")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, " 3")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, " 4")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "5")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "6")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "7")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "8")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "9")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "10")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "12")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "13")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+N3 = Split(wordNum3, "14")
+
+If UBound(N3) = 2 Then
+
+    Bot3Cards = 2
+    PairCounter3 = PairCounter3 + 1
+
+ElseIf UBound(N3) = 3 Then
+
+    Bot3Cards = 4
+    ThreeCounter3 = ThreeCounter3 + 1
+
+ElseIf UBound(N3) = 4 Then
+
+    Bot3Cards = 8
+
+Else
+
+End If
+
+If PairCounter3 = 2 Then
+
+    Bot3Cards = 3
+
+End If
+
+If PairCounter3 = 2 And ThreeCounter3 = 1 Then
+
+    Bot3Cards = 7
+    
+End If
+
+If Bot3Cards = 0 Then
+
+    Bot3Cards = 1
+
+End If
+
+End Sub
+
+Public Sub NP4()
+
+N4 = Split(wordNum4, " 2")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "11")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, " 3")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, " 4")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "5")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "6")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "7")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "8")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "9")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "10")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "12")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "13")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+N4 = Split(wordNum4, "14")
+
+If UBound(N4) = 2 Then
+
+    Bot4Cards = 2
+    PairCounter4 = PairCounter4 + 1
+
+ElseIf UBound(N4) = 3 Then
+
+    Bot4Cards = 4
+    ThreeCounter4 = ThreeCounter4 + 1
+
+ElseIf UBound(N4) = 4 Then
+
+    Bot4Cards = 8
+
+Else
+
+End If
+
+If PairCounter4 = 2 Then
+
+    Bot4Cards = 3
+
+End If
+
+If PairCounter4 = 2 And ThreeCounter4 = 1 Then
+
+    Bot4Cards = 7
+    
+End If
+
+If Bot4Cards = 0 Then
+
+    Bot4Cards = 1
+
+End If
+
+Call CheckWinsP
+
+End Sub
+
+Public Sub RoyalFlushP()
+
+If imgPlayerCard(1).Tag = "Clubs - 1" And imgPlayerCard(2).Tag = "Clubs - 10" And imgFlopCard(1).Tag = "Clubs - J" And imgFlopCard(2).Tag = "Clubs - Q" And imgFlopCard(3).Tag = "Clubs - K" Or _
+    imgPlayerCard(1).Tag = "Diamonds - 1" And imgPlayerCard(2).Tag = "Diamonds - 10" And imgFlopCard(1).Tag = "Diamonds - J" And imgFlopCard(2).Tag = "Diamonds - Q" And imgFlopCard(3).Tag = "Diamonds - K" Or _
+    imgPlayerCard(1).Tag = "Hearts - 1" And imgPlayerCard(2).Tag = "Clubs - 10" And imgFlopCard(1).Tag = "Hearts - J" And imgFlopCard(2).Tag = "Hearts - Q" And imgFlopCard(3).Tag = "Hearts - K" Or _
+    imgPlayerCard(1).Tag = "Spades - 1" And imgPlayerCard(2).Tag = "Spades - 10" And imgFlopCard(1).Tag = "Spades - J" And imgFlopCard(2).Tag = "Clubs - Q" And imgFlopCard(3).Tag = "Spades - K" Then '1
+    
+    PlayerCards = 10 'Royal Flush
+
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(2).Tag = d And imgFlopCard(3).Tag = d And imgTurnCard.Tag = d Then '2
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(3).Tag = d And imgTurnCard.Tag = d And imgRiverCard.Tag = d Then '3
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(1).Tag = d And imgFlopCard(2).Tag = d And imgTurnCard.Tag = d Then '4
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(1).Tag = d And imgFlopCard(2).Tag = d And imgRiverCard.Tag = d Then '5
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(2).Tag = d And imgTurnCard.Tag = d And imgRiverCard.Tag = d Then '6
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(1).Tag = d And imgTurnCard.Tag = d And imgRiverCard.Tag = d Then '7
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(1).Tag = d And imgFlopCard(3).Tag = d And imgRiverCard.Tag = d Then '8
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(2).Tag = d And imgFlopCard(3).Tag = d And imgRiverCard.Tag = d Then '9
+
+'ElseIf imgPlayerCard(1).Tag = 1 And imgPlayerCard(2).Tag = d And imgFlopCard(1).Tag = d And imgFlopCard(3).Tag = d And imgTurnCard.Tag = d Then '10
+
+End If
+
+End Sub
